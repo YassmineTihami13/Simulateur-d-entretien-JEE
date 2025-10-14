@@ -37,7 +37,7 @@
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
-                        <a class="btn btn-outline-primary btn-sm" href="login.jsp">
+                        <a class="btn btn-outline-primary btn-sm" href="jsp/login.jsp">
                             <i class="fas fa-sign-in-alt me-1"></i>Connexion
                         </a>
                     </li>
