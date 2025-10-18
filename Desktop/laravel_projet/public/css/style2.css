@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+* {
+    
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: linear-gradient(rgba(252, 241, 241, 0.2),rgba(170, 168, 168, 0.2)),url();
+    background-repeat: no-repeat;
+        background-size: cover;
+        overflow: hidden; 
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar styling */
+.sidebar {
+    width: 250px;
+    background-color: #2c2aad;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); /* Ombre douce */
+}
+
+.sidebar-btn {
+    margin-top: 15px;
+    color: #fff;
+    padding: 15px;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.sidebar-btn:hover {
+    background-color: #e3d5ca;
+    color:#f9fbfc;
+}
+
+/* Content area styling */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.form-container {
+
+    background-color: #f1faee; 
+    background:linear-gradient(rgba(65, 123, 247, 0.2),rgba(70, 149, 247, 0.3));
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 60rem;
+            
+            margin-top:25px;
+            margin-left:70px;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #9d9895;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            margin:20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            width: 26.2rem;
+            color:#130443;
+    
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 14px;
+            background-color: #f7f3ed;
+            
+        }
+
+        .form-group1{
+            width:17rem;
+            margin-bottom: 15px;
+            margin:20px;
+    
+        }
+
+        .form-group1 label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            width: 100%;
+            color:#130443;
+    
+        }
+        
+
+        .form-group1 input, .form-group1 textarea , .form-group1 select{
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 14px;
+            background-color: #f7f3ed;
+            
+        }
+        .form-group1 textarea{
+            height:2.2rem;
+        }
+       
+
+        .form-group button {
+            width: 100%;
+            max-width:15rem;
+            margin-left:20rem;
+            padding: 10px;
+            background-color: #462cbc;
+            color: #edf4fa;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #1e086e;
+        }
+        
+        
+        .group-container{
+            margin-top:-20px;
+         display:flex;
+         flex-direction:row;
+         justify-content:space-between;
+        }
+        .group-container1{
+            margin-top:-20px;
+            width: 60rem;
+         display:flex;
+         flex-direction:row;
+         flex-wrap: wrap; 
+   
+        }
+        .feedback {
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-group .invalide {
+            border: 2px solid red;
+        }
+        .form-group .valide {
+            border: 2px solid green;
+        }
+        #submitButton:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        span.error {
+            color: red;
+            font-size: 12px;
+        }
+        .reponse{
+            color:#130443;
+            font-weight: bold;
+
+        }
