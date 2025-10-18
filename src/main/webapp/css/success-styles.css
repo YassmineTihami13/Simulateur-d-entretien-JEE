@@ -10,14 +10,13 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* au lieu de center, sinon le scroll ne démarre pas */
+    align-items: flex-start;
     padding: 40px 20px;
     position: relative;
-    overflow-x: hidden; /* garde horizontal masqué */
-    overflow-y: auto;   /* permet le scroll vertical */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
-/* Effets de fond animés */
 body::before {
     content: '';
     position: absolute;
@@ -76,7 +75,6 @@ body::after {
     }
 }
 
-/* Confettis */
 .success-container::before {
     content: '🎊';
     position: absolute;

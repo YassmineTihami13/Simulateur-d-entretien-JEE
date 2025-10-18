@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription Formateur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/register-styles.css">
 </head>
 <body>
@@ -20,7 +21,7 @@
             </div>
         <% } %>
 
-        <form method="post" action="register" id="registerForm">
+        <form method="post" action="register" id="registerForm" enctype="multipart/form-data">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="nom">Nom <span class="required">*</span></label>
@@ -58,15 +59,13 @@
                     <label for="specialite">Spécialité <span class="required">*</span></label>
                     <select id="specialite" name="specialite" class="specialty-select" required>
                         <option value="">Sélectionnez une spécialité</option>
-                        <option value="Développement Web">Développement Web</option>
-                        <option value="Data Science">Data Science</option>
-                        <option value="Marketing Digital">Marketing Digital</option>
-                        <option value="Design UI/UX">Design UI/UX</option>
-                        <option value="Gestion de Projet">Gestion de Projet</option>
-                        <option value="Ressources Humaines">Ressources Humaines</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Communication">Communication</option>
-                        <option value="Autre">Autre</option>
+                        <option value="INFORMATIQUE">Informatique</option>
+                        <option value="MECATRONIQUE">Mécatronique</option>
+                        <option value="INTELLIGENCE_ARTIFICIELLE">Intelligence Artificielle</option>
+                        <option value="CYBERSECURITE">Cybersécurité</option>
+                        <option value="GSTR">GSTR</option>
+                        <option value="SUPPLY_CHAIN_MANAGEMENT">Supply Chain Management</option>
+                        <option value="GENIE_CIVIL">Génie Civil</option>
                     </select>
                 </div>
 
@@ -82,11 +81,18 @@
                            value="<%= request.getParameter("tarifHoraire") != null ? request.getParameter("tarifHoraire") : "" %>">
                 </div>
 
-                <div class="form-group">
-                    <label for="certifications">Certifications</label>
-                    <input type="text" id="certifications" name="certifications"
-                           placeholder="Ex: SCRUM Master, PMP..."
-                           value="<%= request.getParameter("certifications") != null ? request.getParameter("certifications") : "" %>">
+                <div class="form-group full-width">
+                    <label for="certifications">Certifications (PDF) <span class="optional">Optionnel</span></label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="certifications" name="certifications"
+                               accept=".pdf" multiple class="file-input">
+                        <label for="certifications" class="file-label">
+                            <span class="file-icon">📄</span>
+                            <span class="file-text">Choisir des fichiers PDF</span>
+                        </label>
+                        <div id="fileList" class="file-list"></div>
+                    </div>
+                    <small class="form-hint">Vous pouvez sélectionner plusieurs fichiers PDF (max 10MB chacun)</small>
                 </div>
 
                 <div class="form-group full-width">
@@ -97,7 +103,7 @@
             </div>
 
             <div class="btn-container">
-                <button type="button" class="btn-secondary" onclick="window.location.href='index.jsp'">Annuler</button>
+                <button type="button" class="btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/index.jsp'">Annuler</button>
                 <button type="submit" class="btn-primary">S'inscrire</button>
             </div>
         </form>
