@@ -7,12 +7,12 @@ public class Formateur extends Utilisateur {
         MECATRONIQUE("Mécatronique"),
         INTELLIGENCE_ARTIFICIELLE("Intelligence Artificielle"),
         CYBERSECURITE("Cybersécurité"),
-        GSTR("Génie des Systèmes et Technologies Réseaux"),
+        GSTR("GSTR"),
         SUPPLY_CHAIN_MANAGEMENT("Supply Chain Management"),
         GENIE_CIVIL("Génie Civil");
 
         private final String displayName;
-
+          
         Specialite(String displayName) {
             this.displayName = displayName;
         }
@@ -30,7 +30,7 @@ public class Formateur extends Utilisateur {
             throw new IllegalArgumentException("Aucune spécialité trouvée pour : " + text);
         }
     }
-
+    private boolean statut = true;  
     private Specialite specialite;
     private int anneeExperience;
     private String certifications;
@@ -120,7 +120,13 @@ public class Formateur extends Utilisateur {
     public void setDescription(String description) {
         this.description = description;
     }
+    public boolean isStatut() {
+        return statut;
+    }
 
+    public void setStatut(boolean statut) {
+        this.statut = statut;
+    }
     @Override
     public String toString() {
         return super.toString() + " Formateur [specialite=" + getSpecialiteDisplayName() +

@@ -53,7 +53,7 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect(request.getContextPath() + "/jsp/formateur.jsp");
                         break;
                     case "ADMIN":
-                        response.sendRedirect(request.getContextPath() + "/jsp/admin.jsp");
+                        response.sendRedirect(request.getContextPath() + "/jsp/adminDashboard.jsp");
                         break;
                     default:
                         response.sendRedirect(request.getContextPath() + "/jsp/login.jsp?error=invalid");
