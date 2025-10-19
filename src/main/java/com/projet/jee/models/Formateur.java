@@ -29,8 +29,7 @@ public class Formateur extends Utilisateur {
             }
             throw new IllegalArgumentException("Aucune spécialité trouvée pour : " + text);
         }
-    }
-    private boolean statut = true;  
+    } 
     private Specialite specialite;
     private int anneeExperience;
     private String certifications;
@@ -120,17 +119,12 @@ public class Formateur extends Utilisateur {
     public void setDescription(String description) {
         this.description = description;
     }
-    public boolean isStatut() {
-        return statut;
-    }
 
-    public void setStatut(boolean statut) {
-        this.statut = statut;
-    }
     @Override
     public String toString() {
         return super.toString() + " Formateur [specialite=" + getSpecialiteDisplayName() +
                 ", anneeExperience=" + anneeExperience +
                 ", tarifHoraire=" + tarifHoraire + " MAD]";
     }
+
 }
