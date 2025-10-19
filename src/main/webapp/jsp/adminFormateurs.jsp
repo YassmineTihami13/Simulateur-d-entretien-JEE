@@ -2,6 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -120,10 +121,10 @@
                 <p>Consultez et gérez les formateurs de la plateforme</p>
             </div>
             <div class="action-buttons">
-                <a href="${pageContext.request.contextPath}/register" class="btn-add">
+                <button class="btn-add" onclick="openAddModal()">
                     <i class="fas fa-plus"></i>
                     Ajouter un Formateur
-                </a>
+                </button>
             </div>
         </div>
 
@@ -346,7 +347,98 @@
         </div>
     </div>
 
-    <!-- Modal de modification du formateur -->
+<!-- Modal d'ajout de formateur -->
+<div id="addFormateurModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Ajouter un Formateur</h3>
+            <button class="modal-close" onclick="closeAddModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addFormateurForm" class="edit-form" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addNom">Nom *</label>
+                        <input type="text" id="addNom" name="nom" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="addPrenom">Prénom *</label>
+                        <input type="text" id="addPrenom" name="prenom" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="addEmail">Email *</label>
+                    <input type="email" id="addEmail" name="email" required class="form-input">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addMotDePasse">Mot de passe *</label>
+                        <input type="password" id="addMotDePasse" name="motDePasse" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="addConfirmMotDePasse">Confirmer le mot de passe *</label>
+                        <input type="password" id="addConfirmMotDePasse" name="confirmMotDePasse" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addSpecialite">Spécialité *</label>
+                        <select id="addSpecialite" name="specialite" required class="form-select">
+                            <option value="">Sélectionnez une spécialité</option>
+                            <option value="INFORMATIQUE">Informatique</option>
+                            <option value="MECATRONIQUE">Mécatronique</option>
+                            <option value="INTELLIGENCE_ARTIFICIELLE">Intelligence Artificielle</option>
+                            <option value="CYBERSECURITE">Cybersécurité</option>
+                            <option value="GSTR">GSTR</option>
+                            <option value="SUPPLY_CHAIN_MANAGEMENT">Supply Chain Management</option>
+                            <option value="GENIE_CIVIL">Génie Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addAnneeExperience">Années d'expérience *</label>
+                        <input type="number" id="addAnneeExperience" name="anneeExperience" min="0" max="50" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addTarifHoraire">Tarif Horaire (MAD) *</label>
+                        <input type="number" id="addTarifHoraire" name="tarifHoraire" min="0" step="0.01" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="addCertifications">Certifications (PDF)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="addCertifications" name="certifications"
+                               accept=".pdf" multiple class="file-input">
+                        <label for="addCertifications" class="file-label">
+                            <span class="file-icon">📄</span>
+                            <span class="file-text">Choisir des fichiers PDF</span>
+                        </label>
+                        <div id="addFileList" class="file-list"></div>
+                    </div>
+                    <small class="form-hint">Vous pouvez sélectionner plusieurs fichiers PDF (max 10MB chacun)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="addDescription">Description</label>
+                    <textarea id="addDescription" name="description" rows="4"
+                              placeholder="Description du formateur..." class="form-textarea"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" onclick="closeAddModal()">Annuler</button>
+            <button type="button" class="btn btn-primary" onclick="submitAddForm()">
+                <i class="fas fa-plus"></i> Ajouter le Formateur
+            </button>
+        </div>
+    </div>
+</div>
 <!-- Modal de modification du formateur -->
 <div id="editFormateurModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 700px;">
@@ -730,6 +822,135 @@ function loadFormateurData(formateurId) {
             confirmBtn.onclick = confirmStatusChange;
         }
 
+// Fonction pour ouvrir le modal d'ajout
+function openAddModal() {
+    document.getElementById('addFormateurModal').style.display = 'flex';
+    document.getElementById('addFormateurForm').reset();
+    document.getElementById('addFileList').innerHTML = '';
+}
+
+// Fonction pour fermer le modal d'ajout
+function closeAddModal() {
+    document.getElementById('addFormateurModal').style.display = 'none';
+}
+
+// Fonction pour soumettre le formulaire d'ajout
+function submitAddForm() {
+    const form = document.getElementById('addFormateurForm');
+    const formData = new FormData(form);
+
+    // Validation côté client
+    const nom = document.getElementById('addNom').value.trim();
+    const prenom = document.getElementById('addPrenom').value.trim();
+    const email = document.getElementById('addEmail').value.trim();
+    const motDePasse = document.getElementById('addMotDePasse').value;
+    const confirmMotDePasse = document.getElementById('addConfirmMotDePasse').value;
+    const specialite = document.getElementById('addSpecialite').value;
+    const anneeExperience = document.getElementById('addAnneeExperience').value;
+    const tarifHoraire = document.getElementById('addTarifHoraire').value;
+
+    // Validation des champs obligatoires
+    if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse ||
+        !specialite || !anneeExperience || !tarifHoraire) {
+        showResultModal(
+            'error',
+            'Erreur de validation',
+            'Veuillez remplir tous les champs obligatoires (*)'
+        );
+        return;
+    }
+
+    // Validation du mot de passe
+    if (motDePasse !== confirmMotDePasse) {
+        showResultModal(
+            'error',
+            'Erreur de validation',
+            'Les mots de passe ne correspondent pas'
+        );
+        return;
+    }
+
+    // Validation des nombres
+    if (isNaN(anneeExperience) || anneeExperience < 0) {
+        showResultModal(
+            'error',
+            'Erreur de validation',
+            'L\'année d\'expérience doit être un nombre valide'
+        );
+        return;
+    }
+
+    if (isNaN(tarifHoraire) || tarifHoraire < 0) {
+        showResultModal(
+            'error',
+            'Erreur de validation',
+            'Le tarif horaire doit être un nombre valide'
+        );
+        return;
+    }
+
+    // Afficher un indicateur de chargement
+    showLoading('Ajout du formateur en cours...');
+
+    // Envoyer les données
+    fetch('${pageContext.request.contextPath}/admin/add-formateur', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Statut HTTP:', response.status);
+        if (!response.ok) {
+            throw new Error('Erreur réseau: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        hideLoading();
+        console.log('Réponse du serveur:', data);
+        if (data.success) {
+            closeAddModal();
+            showResultModal(
+                'success',
+                'Succès',
+                data.message || 'Le formateur a été ajouté avec succès.'
+            );
+        } else {
+            showResultModal(
+                'error',
+                'Erreur',
+                data.error || 'Une erreur est survenue lors de l\'ajout.'
+            );
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Erreur détaillée:', error);
+        showResultModal(
+            'error',
+            'Erreur',
+            'Une erreur est survenue lors de l\'ajout: ' + error.message
+        );
+    });
+}
+
+// Gestion de l'affichage des fichiers sélectionnés
+document.getElementById('addCertifications').addEventListener('change', function(e) {
+    const fileList = document.getElementById('addFileList');
+    fileList.innerHTML = '';
+
+    Array.from(this.files).forEach(file => {
+        if (file.type === 'application/pdf') {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <i class="fas fa-file-pdf" style="color: #e74c3c;"></i>
+                <span>${file.name}</span>
+                
+            `;
+            fileList.appendChild(fileItem);
+        }
+    });
+});
         // Fonction pour confirmer le changement de statut
         function confirmStatusChange() {
             const modal = document.getElementById('statusModal');
