@@ -10,7 +10,8 @@
     <title>Gestion des Formateurs | InterviewPro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboardAdmin.css">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminFormateurs.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminFormateurs.css">
+
 </head>
 <body>
     <!-- Navbar -->
@@ -341,6 +342,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal de confirmation pour activation/désactivation -->
     <div id="statusModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 500px;">
@@ -356,9 +358,7 @@
                     <div class="status-message" id="statusModalMessage">
                         <!-- Message sera ajouté dynamiquement -->
                     </div>
-                    <div class="formateur-info" id="statusFormateurInfo">
-                        <!-- Info formateur sera ajoutée dynamiquement -->
-                    </div>
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -392,13 +392,18 @@
     </div>
 
     <script>
+        // Variables globales pour stocker les données temporaires
+        let currentFormateurId = null;
+        let currentNewStatus = null;
+        let currentFormateurData = null;
+
         // Fonction pour afficher les détails du formateur
         function viewFormateur(formateurId) {
             const modal = document.getElementById('formateurModal');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const formateurDetails = document.getElementById('formateurDetails');
             const errorMessage = document.getElementById('errorMessage');
-            
+
             // Afficher le modal et le spinner
             modal.style.display = 'flex';
             loadingSpinner.style.display = 'block';
@@ -416,21 +421,21 @@
                 .then(data => {
                     // Cacher le spinner et afficher les détails
                     loadingSpinner.style.display = 'none';
-                    
+
                     if (data.error) {
                         throw new Error(data.error);
                     }
-                    
+
                     // Remplir les données du formateur
-                    document.getElementById('formateurAvatarLarge').textContent = 
+                    document.getElementById('formateurAvatarLarge').textContent =
                         data.prenom.charAt(0) + data.nom.charAt(0);
-                    document.getElementById('formateurNomComplet').textContent = 
+                    document.getElementById('formateurNomComplet').textContent =
                         data.prenom + ' ' + data.nom;
                     document.getElementById('formateurEmail').textContent = data.email;
                     document.getElementById('formateurSpecialite').textContent = data.specialiteDisplayName;
                     document.getElementById('formateurExperience').textContent = data.anneeExperience + ' ans';
                     document.getElementById('formateurTarif').textContent = data.tarifHoraire + ' MAD';
-                    
+
                     // Gérer la description
                     const descriptionElement = document.getElementById('formateurDescription');
                     if (data.description && data.description.trim() !== '') {
@@ -440,7 +445,7 @@
                         descriptionElement.innerHTML = '<em>Aucune description fournie</em>';
                     }
 
-                    // Gérer les certifications - AFFICHAGE SEULEMENT SANS TÉLÉCHARGEMENT
+                    // Gérer les certifications
                     const certificationsList = document.getElementById('certificationsList');
                     certificationsList.innerHTML = '';
 
@@ -448,11 +453,10 @@
                         data.certifications.forEach(certification => {
                             const certItem = document.createElement('div');
                             certItem.className = 'certification-item';
-                            
-                            // Extraire le nom original du fichier (sans le préfixe UUID)
+
+                            // Extraire le nom original du fichier
                             const originalFileName = certification.substring(certification.indexOf('_') + 1);
-                            
-                            // AFFICHAGE SIMPLE SANS BOUTON DE TÉLÉCHARGEMENT
+
                             certItem.innerHTML = `
                                 <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 8px;"></i>
                                 <span class="certification-name">\${originalFileName}</span>
@@ -482,7 +486,7 @@
                 });
         }
 
-        // Fonction pour fermer le modal
+        // Fonction pour fermer le modal des détails
         function closeModal() {
             document.getElementById('formateurModal').style.display = 'none';
         }
@@ -494,169 +498,188 @@
             }
         });
 
-        // Fonction pour changer le statut du formateur
-// Variables globales pour stocker les données temporaires
-let currentFormateurId = null;
-let currentNewStatus = null;
-let currentFormateurData = null;
+        // Fonction pour ouvrir le modal de confirmation
+   // Fonction pour ouvrir le modal de confirmation
+   function toggleFormateurStatus(formateurId, newStatus) {
+       currentFormateurId = formateurId;
+       currentNewStatus = newStatus;
 
-// Fonction pour ouvrir le modal de confirmation
-function toggleFormateurStatus(formateurId, newStatus) {
-    currentFormateurId = formateurId;
-    currentNewStatus = newStatus;
+       // CORRECTION : Trouver les données du formateur dans la liste avec un meilleur sélecteur
+       const formateurRow = document.querySelector(`tr:has(button[onclick*="toggleFormateurStatus(${formateurId}, ${newStatus})"])`);
 
-    // Trouver les données du formateur dans la liste
-    const formateurRow = document.querySelector(`tr:has(button[onclick*="${formateurId}"])`);
-    const formateurNom = formateurRow.querySelector('.user-details h4').textContent;
-    const formateurEmail = formateurRow.querySelector('.user-details p').textContent;
-    const formateurSpecialite = formateurRow.querySelector('.specialite-badge').textContent;
+       // Si le sélecteur précédent ne fonctionne pas, essayez cette alternative :
+       if (!formateurRow) {
+           // Alternative : chercher par l'ID dans toutes les lignes
+           const allRows = document.querySelectorAll('.table tbody tr');
+           for (let row of allRows) {
+               const buttons = row.querySelectorAll('button');
+               for (let button of buttons) {
+                   if (button.onclick && button.onclick.toString().includes(`toggleFormateurStatus(${formateurId},`)) {
+                       formateurRow = row;
+                       break;
+                   }
+               }
+               if (formateurRow) break;
+           }
+       }
 
-    currentFormateurData = {
-        nomComplet: formateurNom,
-        email: formateurEmail,
-        specialite: formateurSpecialite
-    };
+       // Si toujours pas trouvé, utiliser une méthode plus simple
+       if (!formateurRow) {
+           console.error('Impossible de trouver la ligne du formateur avec ID:', formateurId);
+           // Utiliser des données par défaut ou afficher un message d'erreur
+           currentFormateurData = {
+               nomComplet: 'Formateur ' + formateurId,
+               email: 'Email non disponible',
+               specialite: 'Spécialité non disponible'
+           };
+       } else {
+           // Récupérer les données normalement
+           const formateurNom = formateurRow.querySelector('.user-details h4').textContent;
+           const formateurEmail = formateurRow.querySelector('.user-details p').textContent;
+           const formateurSpecialite = formateurRow.querySelector('.specialite-badge').textContent;
 
-    // Configurer le modal selon l'action
-    const modal = document.getElementById('statusModal');
-    const title = document.getElementById('statusModalTitle');
-    const icon = document.getElementById('statusModalIcon');
-    const message = document.getElementById('statusModalMessage');
-    const formateurInfo = document.getElementById('statusFormateurInfo');
-    const confirmBtn = document.getElementById('confirmStatusBtn');
+           currentFormateurData = {
+               nomComplet: formateurNom,
+               email: formateurEmail,
+               specialite: formateurSpecialite
+           };
+       }
 
-    if (newStatus) {
-        // Activation
-        title.textContent = 'Activer le Formateur';
-        icon.className = 'status-icon activate';
-        icon.innerHTML = '<i class="fas fa-check-circle"></i>';
-        message.textContent = 'Voulez-vous activer ce formateur ?';
-        confirmBtn.className = 'btn btn-confirm activate';
-        confirmBtn.innerHTML = '<i class="fas fa-check"></i> Activer';
-    } else {
-        // Désactivation
-        title.textContent = 'Désactiver le Formateur';
-        icon.className = 'status-icon deactivate';
-        icon.innerHTML = '<i class="fas fa-ban"></i>';
-        message.textContent = 'Voulez-vous désactiver ce formateur ?';
-        confirmBtn.className = 'btn btn-confirm deactivate';
-        confirmBtn.innerHTML = '<i class="fas fa-ban"></i> Désactiver';
-    }
+       // Configurer le modal selon l'action
+       const modal = document.getElementById('statusModal');
+       const title = document.getElementById('statusModalTitle');
+       const icon = document.getElementById('statusModalIcon');
+       const message = document.getElementById('statusModalMessage');
+       const formateurInfo = document.getElementById('statusFormateurInfo');
+       const confirmBtn = document.getElementById('confirmStatusBtn');
 
-    // Afficher les informations du formateur
-    formateurInfo.innerHTML = `
-        <h4>${formateurNom}</h4>
-        <p><strong>Email:</strong> ${formateurEmail}</p>
-        <p><strong>Spécialité:</strong> ${formateurSpecialite}</p>
-    `;
+       if (newStatus) {
+           // Activation
+           title.textContent = 'Activer le Formateur';
+           icon.className = 'status-icon activate';
+           icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+           message.textContent = 'Voulez-vous activer ce formateur ?';
+           confirmBtn.className = 'btn btn-confirm activate';
+           confirmBtn.innerHTML = '<i class="fas fa-check"></i> Activer';
+       } else {
+           // Désactivation
+           title.textContent = 'Désactiver le Formateur';
+           icon.className = 'status-icon deactivate';
+           icon.innerHTML = '<i class="fas fa-ban"></i>';
+           message.textContent = 'Voulez-vous désactiver ce formateur ?';
+           confirmBtn.className = 'btn btn-confirm deactivate';
+           confirmBtn.innerHTML = '<i class="fas fa-ban"></i> Désactiver';
+       }
 
-    // Afficher le modal
-    modal.style.display = 'flex';
 
-    // Configurer le bouton de confirmation
-    confirmBtn.onclick = confirmStatusChange;
-}
 
-// Fonction pour confirmer le changement de statut
-function confirmStatusChange() {
-    const modal = document.getElementById('statusModal');
-    modal.style.display = 'none';
+       // Afficher le modal
+       modal.style.display = 'flex';
 
-    // Afficher un indicateur de chargement
-    showLoading('Traitement en cours...');
+       // Configurer le bouton de confirmation
+       confirmBtn.onclick = confirmStatusChange;
+   }
 
-    // Faire l'appel AJAX pour changer le statut
-    fetch('${pageContext.request.contextPath}/admin/toggle-formateur-status?id=' + currentFormateurId + '&status=' + currentNewStatus, {
-        method: 'POST'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur lors de la modification du statut');
+        // Fonction pour confirmer le changement de statut
+        function confirmStatusChange() {
+            const modal = document.getElementById('statusModal');
+            modal.style.display = 'none';
+
+            // Afficher un indicateur de chargement
+            showLoading('Traitement en cours...');
+
+            // Faire l'appel AJAX pour changer le statut
+            fetch('${pageContext.request.contextPath}/admin/toggle-formateur-status?id=' + currentFormateurId + '&status=' + currentNewStatus, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la modification du statut');
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+
+                if (data.success) {
+                    showResultModal(
+                        'success',
+                        currentNewStatus ? 'Formateur activé avec succès' : 'Formateur désactivé avec succès',
+                        `Le formateur <strong>${currentFormateurData.nomComplet}</strong> a été ${currentNewStatus ? 'activé' : 'désactivé'} avec succès.`
+                    );
+                } else {
+                    throw new Error(data.error || 'Erreur inconnue');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Erreur:', error);
+                showResultModal(
+                    'error',
+                    'Erreur',
+                    `Une erreur est survenue lors de la modification du statut: ${error.message}`
+                );
+            });
         }
-        return response.json();
-    })
-    .then(data => {
-        hideLoading();
 
-        if (data.success) {
-            showResultModal(
-                'success',
-                currentNewStatus ? 'Formateur activé avec succès' : 'Formateur désactivé avec succès',
-                `Le formateur <strong>${currentFormateurData.nomComplet}</strong> a été ${currentNewStatus ? 'activé' : 'désactivé'} avec succès.`
-            );
-        } else {
-            throw new Error(data.error || 'Erreur inconnue');
+        // Fonction pour afficher le modal de résultat
+        function showResultModal(type, title, message) {
+            const modal = document.getElementById('resultModal');
+            const modalTitle = document.getElementById('resultModalTitle');
+            const icon = document.getElementById('resultModalIcon');
+            const messageElement = document.getElementById('resultModalMessage');
+
+            modalTitle.textContent = title;
+
+            if (type === 'success') {
+                icon.className = 'result-icon success';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else {
+                icon.className = 'result-icon error';
+                icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            }
+
+            messageElement.innerHTML = message;
+            modal.style.display = 'flex';
         }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Erreur:', error);
-        showResultModal(
-            'error',
-            'Erreur',
-            `Une erreur est survenue lors de la modification du statut: ${error.message}`
-        );
-    });
-}
 
-// Fonction pour afficher le modal de résultat
-function showResultModal(type, title, message) {
-    const modal = document.getElementById('resultModal');
-    const modalTitle = document.getElementById('resultModalTitle');
-    const icon = document.getElementById('resultModalIcon');
-    const messageElement = document.getElementById('resultModalMessage');
+        // Fonctions pour fermer les modals
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+            currentFormateurId = null;
+            currentNewStatus = null;
+            currentFormateurData = null;
+        }
 
-    modalTitle.textContent = title;
+        function closeResultModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            // Recharger la page pour voir les changements
+            location.reload();
+        }
 
-    if (type === 'success') {
-        icon.className = 'result-icon success';
-        icon.innerHTML = '<i class="fas fa-check-circle"></i>';
-    } else {
-        icon.className = 'result-icon error';
-        icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
-    }
+        // Fonctions pour l'indicateur de chargement
+        function showLoading(message) {
+            // Vous pouvez implémenter un overlay de chargement ici
+            console.log('Chargement:', message);
+        }
 
-    messageElement.innerHTML = message;
-    modal.style.display = 'flex';
-}
+        function hideLoading() {
+            // Cacher l'indicateur de chargement
+            console.log('Chargement terminé');
+        }
 
-// Fonctions pour fermer les modals
-function closeStatusModal() {
-    document.getElementById('statusModal').style.display = 'none';
-    currentFormateurId = null;
-    currentNewStatus = null;
-    currentFormateurData = null;
-}
+        // Fermer les modals en cliquant à l'extérieur
+        document.getElementById('statusModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStatusModal();
+            }
+        });
 
-function closeResultModal() {
-    document.getElementById('resultModal').style.display = 'none';
-    // Recharger la page pour voir les changements
-    location.reload();
-}
-
-// Fonctions pour l'indicateur de chargement
-function showLoading(message) {
-    // Vous pouvez implémenter un overlay de chargement ici
-    console.log('Chargement:', message);
-}
-
-function hideLoading() {
-    // Cacher l'indicateur de chargement
-    console.log('Chargement terminé');
-}
-
-// Fermer les modals en cliquant à l'extérieur
-document.getElementById('statusModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeStatusModal();
-    }
-});
-
-document.getElementById('resultModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeResultModal();
-    }
-});
+        document.getElementById('resultModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeResultModal();
+            }
+        });
 
         // Fonctions existantes...
         function editFormateur(formateurId) {
