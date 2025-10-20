@@ -2,7 +2,7 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.FormateurDAO;
-import com.projet.jee.model.Formateur;
+import com.projet.jee.models.Formateur;
 import com.google.gson.Gson;
 
 import javax.servlet.ServletException;

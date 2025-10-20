@@ -1,4 +1,4 @@
-package com.projet.jee.model;
+package com.projet.jee.models;
 
 public class Candidat extends Utilisateur {
     private String domaineProfessionnel;

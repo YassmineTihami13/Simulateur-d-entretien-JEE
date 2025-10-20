@@ -1,7 +1,6 @@
 package com.projet.jee.service;
 
 import com.projet.jee.dao.ConnectionBD;
-import com.projet.jee.model.Administrateur;
 
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -52,7 +51,7 @@ public class AdminCreator {
      * Ajoute un administrateur dans la base.
      * @return true si succès, false sinon
      */
-    public static boolean ajouterAdmin(com.projet.jee.model.Administrateur admin) {
+    public static boolean ajouterAdmin(com.projet.jee.models.Administrateur admin) {
         String sql = "INSERT INTO utilisateur (nom, prenom, email, motDePasse, role, date_creation) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = ConnectionBD.getConnection()) {
@@ -103,7 +102,7 @@ public class AdminCreator {
      * Test direct depuis la console (main)
      */
     public static void main(String[] args) {
-        com.projet.jee.model.Administrateur admin = new com.projet.jee.model.Administrateur(
+        com.projet.jee.models.Administrateur admin = new com.projet.jee.models.Administrateur(
                 3,
                 "Admi3",
                 "Principal",

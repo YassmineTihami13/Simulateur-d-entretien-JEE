@@ -1,7 +1,7 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.ConnectionBD;
-import com.projet.jee.model.Utilisateur;
+import com.projet.jee.models.Utilisateur;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;

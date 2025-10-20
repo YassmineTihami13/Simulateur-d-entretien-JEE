@@ -1,6 +1,4 @@
-package com.projet.jee.model;
-
-import java.time.LocalDateTime;
+package com.projet.jee.models;
 
 public class Administrateur extends Utilisateur {
 

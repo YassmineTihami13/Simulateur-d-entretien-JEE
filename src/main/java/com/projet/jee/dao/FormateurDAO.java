@@ -1,8 +1,8 @@
 
 package com.projet.jee.dao;
 
-import com.projet.jee.model.Formateur;
-import com.projet.jee.model.Utilisateur;
+import com.projet.jee.models.Formateur;
+import com.projet.jee.models.Utilisateur;
 
 import java.sql.*;
 import java.util.ArrayList;

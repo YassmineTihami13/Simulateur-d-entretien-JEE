@@ -2,7 +2,7 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.FormateurDAO;
-import com.projet.jee.model.Formateur;
+import com.projet.jee.models.Formateur;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

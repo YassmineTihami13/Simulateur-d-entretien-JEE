@@ -1,8 +1,8 @@
 
 package com.projet.jee.dao;
 
-import com.projet.jee.model.Candidat;
-import com.projet.jee.model.Utilisateur;
+import com.projet.jee.models.Candidat;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;

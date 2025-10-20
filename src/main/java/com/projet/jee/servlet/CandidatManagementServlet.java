@@ -1,7 +1,7 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.CandidatDAO;
-import com.projet.jee.model.Candidat;
+import com.projet.jee.models.Candidat;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

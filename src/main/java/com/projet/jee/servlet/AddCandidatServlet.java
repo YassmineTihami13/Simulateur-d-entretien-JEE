@@ -1,8 +1,8 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.UtilisateurDAO;
-import com.projet.jee.model.Candidat;
-import com.projet.jee.model.Utilisateur;
+import com.projet.jee.models.Candidat;
+import com.projet.jee.models.Utilisateur;
 import com.google.gson.Gson;
 
 import javax.servlet.ServletException;
