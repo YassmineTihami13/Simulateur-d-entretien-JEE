@@ -2,6 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -12,6 +13,69 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboardAdmin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminFormateurs.css">
+    <style>
+        .certification-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .certification-item:hover {
+            background-color: #f8fafc;
+            border-color: #3b82f6;
+        }
+        
+        .certification-name {
+            flex: 1;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .certification-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-view-certificate {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-view-certificate:hover {
+            background: #2563eb;
+        }
+        
+        .no-certifications {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+        
+        .certifications-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .certification-status {
+            background: #10B981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -419,7 +483,7 @@
                             <span class="file-icon">📄</span>
                             <span class="file-text">Choisir des fichiers PDF</span>
                         </label>
-                        <div id="addFileList" class="file-list"></div>
+                        <div id="addFileList" class="file-lista"></div>
                     </div>
                     <small class="form-hint">Vous pouvez sélectionner plusieurs fichiers PDF (max 10MB chacun)</small>
                 </div>
@@ -565,57 +629,58 @@
         let currentFormateurName = null;
 
         // Fonction pour afficher les détails du formateur
-      function viewFormateur(formateurId) {
-                 const modal = document.getElementById('formateurModal');
-                 const loadingSpinner = document.getElementById('loadingSpinner');
-                 const formateurDetails = document.getElementById('formateurDetails');
-                 const errorMessage = document.getElementById('errorMessage');
+        function viewFormateur(formateurId) {
+            const modal = document.getElementById('formateurModal');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const formateurDetails = document.getElementById('formateurDetails');
+            const errorMessage = document.getElementById('errorMessage');
 
-                 // Afficher le modal et le spinner
-                 modal.style.display = 'flex';
-                 loadingSpinner.style.display = 'block';
-                 formateurDetails.style.display = 'none';
-                 errorMessage.style.display = 'none';
+            // Afficher le modal et le spinner
+            modal.style.display = 'flex';
+            loadingSpinner.style.display = 'block';
+            formateurDetails.style.display = 'none';
+            errorMessage.style.display = 'none';
 
-                 // Faire l'appel AJAX pour récupérer les détails
-                 fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
-                     .then(response => {
-                         if (!response.ok) {
-                             throw new Error('Erreur réseau: ' + response.status);
-                         }
-                         return response.json();
-                     })
-                     .then(data => {
-                         // Cacher le spinner et afficher les détails
-                         loadingSpinner.style.display = 'none';
+            // Faire l'appel AJAX pour récupérer les détails
+            fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Cacher le spinner et afficher les détails
+                    loadingSpinner.style.display = 'none';
 
-                         if (data.error) {
-                             throw new Error(data.error);
-                         }
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
 
-                         // Remplir les données du formateur
-                         document.getElementById('formateurAvatarLarge').textContent =
-                             data.prenom.charAt(0) + data.nom.charAt(0);
-                         document.getElementById('formateurNomComplet').textContent =
-                             data.prenom + ' ' + data.nom;
-                         document.getElementById('formateurEmail').textContent = data.email;
-                         document.getElementById('formateurSpecialite').textContent = data.specialiteDisplayName;
-                         document.getElementById('formateurExperience').textContent = data.anneeExperience + ' ans';
-                         document.getElementById('formateurTarif').textContent = data.tarifHoraire + ' MAD';
+                    // Remplir les données du formateur
+                    document.getElementById('formateurAvatarLarge').textContent =
+                        data.prenom.charAt(0) + data.nom.charAt(0);
+                    document.getElementById('formateurNomComplet').textContent =
+                        data.prenom + ' ' + data.nom;
+                    document.getElementById('formateurEmail').textContent = data.email;
+                    document.getElementById('formateurSpecialite').textContent = data.specialiteDisplayName;
+                    document.getElementById('formateurExperience').textContent = data.anneeExperience + ' ans';
+                    document.getElementById('formateurTarif').textContent = data.tarifHoraire + ' MAD';
 
-                         // Gérer la description
-                         const descriptionElement = document.getElementById('formateurDescription');
-                         if (data.description && data.description.trim() !== '') {
-                             descriptionElement.textContent = data.description;
-                             descriptionElement.style.display = 'block';
-                         } else {
-                             descriptionElement.innerHTML = '<em>Aucune description fournie</em>';
-                         }
+                    // Gérer la description
+                    const descriptionElement = document.getElementById('formateurDescription');
+                    if (data.description && data.description.trim() !== '') {
+                        descriptionElement.textContent = data.description;
+                        descriptionElement.style.display = 'block';
+                    } else {
+                        descriptionElement.innerHTML = '<em>Aucune description fournie</em>';
+                    }
 
-                         // Gérer les certifications
-                         const certificationsList = document.getElementById('certificationsList');
+                    // Gérer les certifications
+      const certificationsList = document.getElementById('certificationsList');
                          certificationsList.innerHTML = '';
-
+                         console.log("Données certifications reçues:", data.certifications);
+                         console.log("hasCertifications:", data.hasCertifications);
                          if (data.hasCertifications && data.certifications && data.certifications.length > 0) {
                              data.certifications.forEach(certification => {
                                  const certItem = document.createElement('div');
@@ -623,35 +688,68 @@
 
                                  // Extraire le nom original du fichier
                                  const originalFileName = certification.substring(certification.indexOf('_') + 1);
-
+                                 console.log(`Nom original pour ${index}:`, originalFileName);
                                  certItem.innerHTML = `
                                      <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 8px;"></i>
                                      <span class="certification-name">\${originalFileName}</span>
-                                     <span class="certification-status" style="background: #10B981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 8px;">
-                                         Disponible
-                                     </span>
-                                 `;
-                                 certificationsList.appendChild(certItem);
-                             });
-                         } else {
-                             certificationsList.innerHTML = `
-                                 <div class="no-certifications">
-                                     <i class="fas fa-file-alt" style="font-size: 2rem; margin-bottom: 8px; opacity: 0.5;"></i>
-                                     <p>Aucune certification disponible</p>
-                                 </div>
-                             `;
-                         }
+                          
+                                <div class="certification-actions">
+                                    <button class="btn-view-certificate" onclick="viewCertificate('\${certification}')">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </button>
+                                </div>
+                            `;
+                            certificationsList.appendChild(certItem);
+                        });
+                    } else {
+                        certificationsList.innerHTML = `
+                            <div class="no-certifications">
+                                <i class="fas fa-file-alt" style="font-size: 2rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                                <p>Aucune certification disponible</p>
+                            </div>
+                        `;
+                    }
 
-                         // Afficher les détails
-                         formateurDetails.style.display = 'block';
-                     })
-                     .catch(error => {
-                         console.error('Erreur:', error);
-                         loadingSpinner.style.display = 'none';
-                         errorMessage.style.display = 'block';
-                         document.getElementById('errorText').textContent = error.message;
-                     });
-             }
+                    // Afficher les détails
+                    formateurDetails.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    loadingSpinner.style.display = 'none';
+                    errorMessage.style.display = 'block';
+                    document.getElementById('errorText').textContent = error.message;
+                });
+        }
+
+     // Fonction corrigée pour visualiser un certificat
+// Fonction corrigée pour visualiser un certificat
+function viewCertificate(storedFileName) {
+    console.log("=== DEBUG viewCertificate ===");
+    console.log("Paramètre brut:", storedFileName);
+    
+    if (!storedFileName || storedFileName.trim() === '') {
+        console.error("ERREUR: Nom de fichier invalide");
+        alert("Impossible d'ouvrir le certificat : nom de fichier manquant");
+        return;
+    }
+
+    const cleanFileName = storedFileName.trim();
+    const encodedFileName = encodeURIComponent(cleanFileName);
+    
+    // CORRECTION ICI : Utilisation correcte de l'interpolation
+    const contextPath = '${pageContext.request.contextPath}'; // Cette variable doit être définie
+    const url = contextPath + '/view-certificate?file=' + encodedFileName;
+    
+    console.log("URL complète:", url);
+    
+    // Validation finale
+    if (url.includes('file=') && !url.endsWith('file=')) {
+        window.open(url, '_blank');
+    } else {
+        console.error("ERREUR: URL mal formée - fichier manquant");
+        alert("Erreur technique : impossible de générer l'URL du certificat");
+    }
+}
 
         // Fonction pour fermer le modal des détails
         function closeModal() {
@@ -671,112 +769,113 @@
         }
 
         // Fonction pour charger les données du formateur
-function loadFormateurData(formateurId) {
-    console.log('Chargement des données pour formateur ID:', formateurId);
-    
-    fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
-        .then(response => {
-            console.log('Réponse HTTP:', response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Données complètes reçues:', data);
+        function loadFormateurData(formateurId) {
+            console.log('Chargement des données pour formateur ID:', formateurId);
             
-            if (data.error) {
-                throw new Error(data.error);
+            fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
+                .then(response => {
+                    console.log('Réponse HTTP:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Données complètes reçues:', data);
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Debug des propriétés de spécialité
+                    console.log('specialite:', data.specialite);
+                    console.log('specialiteEnumName:', data.specialiteEnumName);
+                    console.log('specialiteDisplayName:', data.specialiteDisplayName);
+
+                    // Essayer différentes propriétés possibles
+                    const specialiteValue = data.specialite || data.specialiteEnumName || data.specialiteDisplayName;
+                    console.log('Valeur de spécialité à utiliser:', specialiteValue);
+
+                    document.getElementById('editFormateurId').value = data.id;
+                    document.getElementById('editNom').value = data.nom;
+                    document.getElementById('editPrenom').value = data.prenom;
+                    document.getElementById('editEmail').value = data.email;
+                    document.getElementById('editSpecialite').value = specialiteValue;
+                    document.getElementById('editAnneeExperience').value = data.anneeExperience;
+                    document.getElementById('editTarifHoraire').value = data.tarifHoraire;
+                    document.getElementById('editDescription').value = data.description || '';
+
+                    // Vérifier si la valeur a été correctement définie
+                    const selectElement = document.getElementById('editSpecialite');
+                    console.log('Option sélectionnée après assignation:', selectElement.value);
+                    console.log('Options disponibles:', Array.from(selectElement.options).map(opt => opt.value));
+                })
+                .catch(error => {
+                    console.error('Erreur détaillée:', error);
+                    alert('Erreur lors du chargement des données: ' + error.message);
+                });
+        }
+
+        // Fonction pour soumettre le formulaire de modification
+        function submitEditForm() {
+            const form = document.getElementById('editFormateurForm');
+            const formData = new FormData(form);
+
+            // Validation côté client
+            const nom = document.getElementById('editNom').value.trim();
+            const prenom = document.getElementById('editPrenom').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const specialite = document.getElementById('editSpecialite').value;
+            const anneeExperience = document.getElementById('editAnneeExperience').value;
+            const tarifHoraire = document.getElementById('editTarifHoraire').value;
+
+            if (!nom || !prenom || !email || !specialite || !anneeExperience || !tarifHoraire) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Veuillez remplir tous les champs obligatoires (*)'
+                );
+                return;
             }
 
-            // Debug des propriétés de spécialité
-            console.log('specialite:', data.specialite);
-            console.log('specialiteEnumName:', data.specialiteEnumName);
-            console.log('specialiteDisplayName:', data.specialiteDisplayName);
+            // Afficher un indicateur de chargement
+            showLoading('Modification en cours...');
 
-            // Essayer différentes propriétés possibles
-            const specialiteValue = data.specialite || data.specialiteEnumName || data.specialiteDisplayName;
-            console.log('Valeur de spécialité à utiliser:', specialiteValue);
-
-            document.getElementById('editFormateurId').value = data.id;
-            document.getElementById('editNom').value = data.nom;
-            document.getElementById('editPrenom').value = data.prenom;
-            document.getElementById('editEmail').value = data.email;
-            document.getElementById('editSpecialite').value = specialiteValue;
-            document.getElementById('editAnneeExperience').value = data.anneeExperience;
-            document.getElementById('editTarifHoraire').value = data.tarifHoraire;
-            document.getElementById('editDescription').value = data.description || '';
-
-            // Vérifier si la valeur a été correctement définie
-            const selectElement = document.getElementById('editSpecialite');
-            console.log('Option sélectionnée après assignation:', selectElement.value);
-            console.log('Options disponibles:', Array.from(selectElement.options).map(opt => opt.value));
-        })
-        .catch(error => {
-            console.error('Erreur détaillée:', error);
-            alert('Erreur lors du chargement des données: ' + error.message);
-        });
-}
-        // Fonction pour soumettre le formulaire de modification
-   function submitEditForm() {
-       const form = document.getElementById('editFormateurForm');
-       const formData = new FormData(form);
-
-       // Validation côté client
-       const nom = document.getElementById('editNom').value.trim();
-       const prenom = document.getElementById('editPrenom').value.trim();
-       const email = document.getElementById('editEmail').value.trim();
-       const specialite = document.getElementById('editSpecialite').value;
-       const anneeExperience = document.getElementById('editAnneeExperience').value;
-       const tarifHoraire = document.getElementById('editTarifHoraire').value;
-
-       if (!nom || !prenom || !email || !specialite || !anneeExperience || !tarifHoraire) {
-           showResultModal(
-               'error',
-               'Erreur de validation',
-               'Veuillez remplir tous les champs obligatoires (*)'
-           );
-           return;
-       }
-
-       // Afficher un indicateur de chargement
-       showLoading('Modification en cours...');
-
-       // Envoyer les données
-       fetch('${pageContext.request.contextPath}/admin/update-formateur', {
-           method: 'POST',
-           body: new URLSearchParams(formData) // Utiliser URLSearchParams au lieu de FormData
-       })
-       .then(response => {
-           if (!response.ok) {
-               throw new Error('Erreur réseau: ' + response.status);
-           }
-           return response.json();
-       })
-       .then(data => {
-           hideLoading();
-           if (data.success) {
-               closeEditModal();
-               showResultModal(
-                   'success',
-                   'Succès',
-                   data.message || 'Le formateur a été modifié avec succès.'
-               );
-           } else {
-               showResultModal(
-                   'error',
-                   'Erreur',
-                   data.error || 'Une erreur est survenue lors de la modification.'
-               );
-           }
-       })
-       .catch(error => {
-           hideLoading();
-           console.error('Erreur:', error);
-           showResultModal(
-               'error',
-               'Erreur',
-               'Une erreur est survenue lors de la communication avec le serveur.'
-           );
-       });
-   }
+            // Envoyer les données
+            fetch('${pageContext.request.contextPath}/admin/update-formateur', {
+                method: 'POST',
+                body: new URLSearchParams(formData) // Utiliser URLSearchParams au lieu de FormData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    closeEditModal();
+                    showResultModal(
+                        'success',
+                        'Succès',
+                        data.message || 'Le formateur a été modifié avec succès.'
+                    );
+                } else {
+                    showResultModal(
+                        'error',
+                        'Erreur',
+                        data.error || 'Une erreur est survenue lors de la modification.'
+                    );
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Erreur:', error);
+                showResultModal(
+                    'error',
+                    'Erreur',
+                    'Une erreur est survenue lors de la communication avec le serveur.'
+                );
+            });
+        }
 
         // Fonction pour fermer la modal de modification
         function closeEditModal() {
@@ -822,135 +921,147 @@ function loadFormateurData(formateurId) {
             confirmBtn.onclick = confirmStatusChange;
         }
 
-// Fonction pour ouvrir le modal d'ajout
-function openAddModal() {
-    document.getElementById('addFormateurModal').style.display = 'flex';
-    document.getElementById('addFormateurForm').reset();
-    document.getElementById('addFileList').innerHTML = '';
-}
-
-// Fonction pour fermer le modal d'ajout
-function closeAddModal() {
-    document.getElementById('addFormateurModal').style.display = 'none';
-}
-
-// Fonction pour soumettre le formulaire d'ajout
-function submitAddForm() {
-    const form = document.getElementById('addFormateurForm');
-    const formData = new FormData(form);
-
-    // Validation côté client
-    const nom = document.getElementById('addNom').value.trim();
-    const prenom = document.getElementById('addPrenom').value.trim();
-    const email = document.getElementById('addEmail').value.trim();
-    const motDePasse = document.getElementById('addMotDePasse').value;
-    const confirmMotDePasse = document.getElementById('addConfirmMotDePasse').value;
-    const specialite = document.getElementById('addSpecialite').value;
-    const anneeExperience = document.getElementById('addAnneeExperience').value;
-    const tarifHoraire = document.getElementById('addTarifHoraire').value;
-
-    // Validation des champs obligatoires
-    if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse ||
-        !specialite || !anneeExperience || !tarifHoraire) {
-        showResultModal(
-            'error',
-            'Erreur de validation',
-            'Veuillez remplir tous les champs obligatoires (*)'
-        );
-        return;
-    }
-
-    // Validation du mot de passe
-    if (motDePasse !== confirmMotDePasse) {
-        showResultModal(
-            'error',
-            'Erreur de validation',
-            'Les mots de passe ne correspondent pas'
-        );
-        return;
-    }
-
-    // Validation des nombres
-    if (isNaN(anneeExperience) || anneeExperience < 0) {
-        showResultModal(
-            'error',
-            'Erreur de validation',
-            'L\'année d\'expérience doit être un nombre valide'
-        );
-        return;
-    }
-
-    if (isNaN(tarifHoraire) || tarifHoraire < 0) {
-        showResultModal(
-            'error',
-            'Erreur de validation',
-            'Le tarif horaire doit être un nombre valide'
-        );
-        return;
-    }
-
-    // Afficher un indicateur de chargement
-    showLoading('Ajout du formateur en cours...');
-
-    // Envoyer les données
-    fetch('${pageContext.request.contextPath}/admin/add-formateur', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        console.log('Statut HTTP:', response.status);
-        if (!response.ok) {
-            throw new Error('Erreur réseau: ' + response.status);
+        // Fonction pour ouvrir le modal d'ajout
+        function openAddModal() {
+            document.getElementById('addFormateurModal').style.display = 'flex';
+            document.getElementById('addFormateurForm').reset();
+            document.getElementById('addFileList').innerHTML = '';
         }
-        return response.json();
-    })
-    .then(data => {
-        hideLoading();
-        console.log('Réponse du serveur:', data);
-        if (data.success) {
-            closeAddModal();
-            showResultModal(
-                'success',
-                'Succès',
-                data.message || 'Le formateur a été ajouté avec succès.'
-            );
-        } else {
-            showResultModal(
-                'error',
-                'Erreur',
-                data.error || 'Une erreur est survenue lors de l\'ajout.'
-            );
-        }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Erreur détaillée:', error);
-        showResultModal(
-            'error',
-            'Erreur',
-            'Une erreur est survenue lors de l\'ajout: ' + error.message
-        );
-    });
-}
 
+        // Fonction pour fermer le modal d'ajout
+        function closeAddModal() {
+            document.getElementById('addFormateurModal').style.display = 'none';
+        }
+
+        // Fonction pour soumettre le formulaire d'ajout
+        function submitAddForm() {
+            const form = document.getElementById('addFormateurForm');
+            const formData = new FormData(form);
+
+            // Validation côté client
+            const nom = document.getElementById('addNom').value.trim();
+            const prenom = document.getElementById('addPrenom').value.trim();
+            const email = document.getElementById('addEmail').value.trim();
+            const motDePasse = document.getElementById('addMotDePasse').value;
+            const confirmMotDePasse = document.getElementById('addConfirmMotDePasse').value;
+            const specialite = document.getElementById('addSpecialite').value;
+            const anneeExperience = document.getElementById('addAnneeExperience').value;
+            const tarifHoraire = document.getElementById('addTarifHoraire').value;
+
+            // Validation des champs obligatoires
+            if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse ||
+                !specialite || !anneeExperience || !tarifHoraire) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Veuillez remplir tous les champs obligatoires (*)'
+                );
+                return;
+            }
+
+            // Validation du mot de passe
+            if (motDePasse !== confirmMotDePasse) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Les mots de passe ne correspondent pas'
+                );
+                return;
+            }
+
+            // Validation des nombres
+            if (isNaN(anneeExperience) || anneeExperience < 0) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'L\'année d\'expérience doit être un nombre valide'
+                );
+                return;
+            }
+
+            if (isNaN(tarifHoraire) || tarifHoraire < 0) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Le tarif horaire doit être un nombre valide'
+                );
+                return;
+            }
+
+            // Afficher un indicateur de chargement
+            showLoading('Ajout du formateur en cours...');
+
+            // Envoyer les données
+            fetch('${pageContext.request.contextPath}/admin/add-formateur', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Statut HTTP:', response.status);
+                if (!response.ok) {
+                    throw new Error('Erreur réseau: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                console.log('Réponse du serveur:', data);
+                if (data.success) {
+                    closeAddModal();
+                    showResultModal(
+                        'success',
+                        'Succès',
+                        data.message || 'Le formateur a été ajouté avec succès.'
+                    );
+                } else {
+                    showResultModal(
+                        'error',
+                        'Erreur',
+                        data.error || 'Une erreur est survenue lors de l\'ajout.'
+                    );
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Erreur détaillée:', error);
+                showResultModal(
+                    'error',
+                    'Erreur',
+                    'Une erreur est survenue lors de l\'ajout: ' + error.message
+                );
+            });
+        }
+
+        // Gestion de l'affichage des fichiers sélectionnés
 // Gestion de l'affichage des fichiers sélectionnés
 document.getElementById('addCertifications').addEventListener('change', function(e) {
     const fileList = document.getElementById('addFileList');
     fileList.innerHTML = '';
 
+    console.log('Fichiers sélectionnés:', this.files); // Pour déboguer
+
     Array.from(this.files).forEach(file => {
+        console.log('Fichier:', file.name, 'Type:', file.type); // Débogage
+        
         if (file.type === 'application/pdf') {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
             fileItem.innerHTML = `
                 <i class="fas fa-file-pdf" style="color: #e74c3c;"></i>
-                <span>${file.name}</span>
-                
+                <span style="margin-left: 8px; color: black;">${file.name}</span>
             `;
             fileList.appendChild(fileItem);
+        } else {
+            console.warn('Fichier non-PDF ignoré:', file.name);
         }
     });
+
+    // Vérifier si la liste est vide après traitement
+    if (fileList.children.length === 0) {
+        fileList.innerHTML = '<p style="color: #999;">Aucun fichier PDF sélectionné</p>';
+    }
 });
+
         // Fonction pour confirmer le changement de statut
         function confirmStatusChange() {
             const modal = document.getElementById('statusModal');
@@ -1027,64 +1138,62 @@ document.getElementById('addCertifications').addEventListener('change', function
             // Recharger la page pour voir les changements
             location.reload();
         }
-  // Fonction pour charger les données du formateur avec l'enum
-function loadFormateurData(formateurId) {
-    console.log('Chargement des données pour formateur ID:', formateurId);
-    
-    fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Données chargées pour édition:', data);
+
+        // Fonction pour charger les données du formateur avec l'enum
+        function loadFormateurData(formateurId) {
+            console.log('Chargement des données pour formateur ID:', formateurId);
             
-            if (data.error) {
-                throw new Error(data.error);
-            }
+            fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Données chargées pour édition:', data);
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
 
-            // Remplir le formulaire
-            document.getElementById('editFormateurId').value = data.id;
-            document.getElementById('editNom').value = data.nom;
-            document.getElementById('editPrenom').value = data.prenom;
-            document.getElementById('editEmail').value = data.email;
+                    // Remplir le formulaire
+                    document.getElementById('editFormateurId').value = data.id;
+                    document.getElementById('editNom').value = data.nom;
+                    document.getElementById('editPrenom').value = data.prenom;
+                    document.getElementById('editEmail').value = data.email;
+                    
+                    // CORRECTION : Utiliser specialiteDisplayName et mapper vers les valeurs du select
+                    const specialiteDisplayName = data.specialiteDisplayName;
+                    console.log('SpecialiteDisplayName:', specialiteDisplayName);
+                    
+                    // Mapper le nom d'affichage vers la valeur enum
+                    const specialiteValue = mapDisplayNameToEnum(specialiteDisplayName);
+                    console.log('Valeur enum mappée:', specialiteValue);
+                    
+                    document.getElementById('editSpecialite').value = specialiteValue;
+                    document.getElementById('editAnneeExperience').value = data.anneeExperience;
+                    document.getElementById('editTarifHoraire').value = data.tarifHoraire;
+                    document.getElementById('editDescription').value = data.description || '';
+
+                    // Vérification finale
+                    console.log('Valeur sélectionnée dans le select:', document.getElementById('editSpecialite').value);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors du chargement des données: ' + error.message);
+                });
+        }
+
+        // Fonction pour mapper le nom d'affichage vers la valeur enum
+        function mapDisplayNameToEnum(displayName) {
+            const mapping = {
+                'Informatique': 'INFORMATIQUE',
+                'Mécatronique': 'MECATRONIQUE',
+                'Intelligence Artificielle': 'INTELLIGENCE_ARTIFICIELLE',
+                'Cybersécurité': 'CYBERSECURITE',
+                'GSTR': 'GSTR',
+                'Supply Chain Management': 'SUPPLY_CHAIN_MANAGEMENT',
+                'Génie Civil': 'GENIE_CIVIL'
+            };
             
-            // CORRECTION : Utiliser specialiteDisplayName et mapper vers les valeurs du select
-            const specialiteDisplayName = data.specialiteDisplayName;
-            console.log('SpecialiteDisplayName:', specialiteDisplayName);
-            
-            // Mapper le nom d'affichage vers la valeur enum
-            const specialiteValue = mapDisplayNameToEnum(specialiteDisplayName);
-            console.log('Valeur enum mappée:', specialiteValue);
-            
-            document.getElementById('editSpecialite').value = specialiteValue;
-            document.getElementById('editAnneeExperience').value = data.anneeExperience;
-            document.getElementById('editTarifHoraire').value = data.tarifHoraire;
-            document.getElementById('editDescription').value = data.description || '';
-
-            // Vérification finale
-            console.log('Valeur sélectionnée dans le select:', document.getElementById('editSpecialite').value);
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Erreur lors du chargement des données: ' + error.message);
-        });
-}
-
-// Fonction pour mapper le nom d'affichage vers la valeur enum
-function mapDisplayNameToEnum(displayName) {
-    const mapping = {
-        'Informatique': 'INFORMATIQUE',
-        'Mécatronique': 'MECATRONIQUE',
-        'Intelligence Artificielle': 'INTELLIGENCE_ARTIFICIELLE',
-        'Cybersécurité': 'CYBERSECURITE',
-        'GSTR': 'GSTR',
-        'Supply Chain Management': 'SUPPLY_CHAIN_MANAGEMENT',
-        'Génie Civil': 'GENIE_CIVIL'
-    };
-    
-    return mapping[displayName] || '';
-}
-
-
-
+            return mapping[displayName] || '';
+        }
 
         // Fonctions pour l'indicateur de chargement
         function showLoading(message) {
@@ -1181,7 +1290,6 @@ function mapDisplayNameToEnum(displayName) {
                 statut: ${formateur.statut}
             });
         </c:forEach>
-
     </script>
 </body>
 </html>

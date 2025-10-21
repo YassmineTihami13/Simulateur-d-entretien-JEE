@@ -31,18 +31,21 @@ import java.util.UUID;
 )
 public class AddFormateurServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "certifications";
-
+  
+	 private static final String UPLOAD_DIR = "certifications";
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        System.out.println("=== [LOG] Démarrage du servlet AddFormateurServlet ===");
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         request.setCharacterEncoding("UTF-8");
 
         try {
-            // Récupération des paramètres
+            // --- Paramètres ---
             String nom = request.getParameter("nom");
             String prenom = request.getParameter("prenom");
             String email = request.getParameter("email");
@@ -53,69 +56,73 @@ public class AddFormateurServlet extends HttpServlet {
             String tarifHoraireStr = request.getParameter("tarifHoraire");
             String description = request.getParameter("description");
 
-            // Validation des champs obligatoires
+            System.out.println("[LOG] Paramètres reçus : nom=" + nom + ", prenom=" + prenom + ", email=" + email
+                    + ", specialite=" + specialite + ", experience=" + anneeExperienceStr + ", tarif=" + tarifHoraireStr);
+
+            // --- Validation ---
             if (nom == null || prenom == null || email == null || motDePasse == null ||
                     nom.trim().isEmpty() || prenom.trim().isEmpty() || email.trim().isEmpty() ||
                     motDePasse.trim().isEmpty()) {
-
+                System.out.println("[ERREUR] Champs manquants");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"success\": false, \"error\": \"Tous les champs obligatoires doivent être remplis.\"}");
                 return;
             }
 
-            // Validation du mot de passe
             if (!motDePasse.equals(confirmMotDePasse)) {
+                System.out.println("[ERREUR] Les mots de passe ne correspondent pas");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"success\": false, \"error\": \"Les mots de passe ne correspondent pas.\"}");
                 return;
             }
 
-            // Gestion des fichiers uploadés
             List<String> uploadedFiles = new ArrayList<>();
-            try {
-                String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdir();
-                }
+            String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
+            
 
-                for (Part part : request.getParts()) {
-                    if (part.getName().equals("certifications") && part.getSize() > 0) {
-                        String fileName = extractFileName(part);
-                        if (fileName != null && fileName.toLowerCase().endsWith(".pdf")) {
-                            String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
-                            String filePath = uploadPath + File.separator + uniqueFileName;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                System.out.println("[LOG] Dossier certifications créé : " + created);
+            } else {
+                System.out.println("[LOG] Dossier certifications existe déjà");
+            }
 
-                            try (InputStream inputStream = part.getInputStream()) {
-                                Files.copy(inputStream, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
-                                uploadedFiles.add(uniqueFileName);
-                            }
+            for (Part part : request.getParts()) {
+                if (part.getName().equals("certifications") && part.getSize() > 0) {
+                    String fileName = extractFileName(part);
+                    System.out.println("[LOG] Fichier détecté : " + fileName);
+                    if (fileName != null && fileName.toLowerCase().endsWith(".pdf")) {
+                        String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+                        File file = new File(uploadDir, uniqueFileName);
+                        try (InputStream inputStream = part.getInputStream()) {
+                            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            uploadedFiles.add(uniqueFileName);
+                            System.out.println("[LOG] Fichier sauvegardé : " + uniqueFileName);
+                        } catch (IOException ex) {
+                            System.err.println("[ERREUR] Impossible de sauvegarder le fichier : " + ex.getMessage());
+                            throw ex;
                         }
                     }
                 }
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"success\": false, \"error\": \"Erreur lors de l'upload des fichiers : \" + e.getMessage()}");
-                return;
             }
 
             String certifications = String.join(";", uploadedFiles);
+            System.out.println("[LOG] Fichiers enregistrés en base : " + certifications);
 
-            // Conversion des nombres
+            // --- Conversion ---
             int anneeExperience = Integer.parseInt(anneeExperienceStr);
             double tarifHoraire = Double.parseDouble(tarifHoraireStr);
             String motDePasseHache = hashPassword(motDePasse);
-
-            // Génération du code de vérification
             String verificationCode = EmailUtil.generateVerificationCode();
-            long expirationTime = System.currentTimeMillis() + (15 * 60 * 1000); // 15 minutes
+            long expirationTime = System.currentTimeMillis() + (15 * 60 * 1000);
 
-            // Insertion en base de données
+            System.out.println("[LOG] Données prêtes pour insertion SQL");
+
+            // --- Insertion base ---
             try (Connection conn = ConnectionBD.getConnection()) {
                 conn.setAutoCommit(false);
-
                 try {
-                    // Insertion dans la table utilisateur
                     String sqlUtilisateur = "INSERT INTO utilisateur (nom, prenom, email, motDePasse, role, verificationCode, codeExpiration, estVerifie, statut) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     PreparedStatement psUtilisateur = conn.prepareStatement(sqlUtilisateur, PreparedStatement.RETURN_GENERATED_KEYS);
                     psUtilisateur.setString(1, nom);
@@ -125,18 +132,15 @@ public class AddFormateurServlet extends HttpServlet {
                     psUtilisateur.setString(5, Utilisateur.Role.FORMATEUR.name());
                     psUtilisateur.setString(6, verificationCode);
                     psUtilisateur.setLong(7, expirationTime);
-                    psUtilisateur.setBoolean(8, false); // Non vérifié par défaut
-                    psUtilisateur.setBoolean(9, true); // Statut actif par défaut
+                    psUtilisateur.setBoolean(8, false);
+                    psUtilisateur.setBoolean(9, true);
                     psUtilisateur.executeUpdate();
 
-                    // Récupération de l'ID généré
                     long userId = 0;
                     var rs = psUtilisateur.getGeneratedKeys();
-                    if (rs.next()) {
-                        userId = rs.getLong(1);
-                    }
+                    if (rs.next()) userId = rs.getLong(1);
+                    System.out.println("[LOG] Nouvel utilisateur ID : " + userId);
 
-                    // Insertion dans la table formateur
                     String sqlFormateur = "INSERT INTO formateur (id, specialite, anneeExperience, certifications, tarifHoraire, description) VALUES (?, ?, ?, ?, ?, ?)";
                     PreparedStatement psFormateur = conn.prepareStatement(sqlFormateur);
                     psFormateur.setLong(1, userId);
@@ -148,50 +152,42 @@ public class AddFormateurServlet extends HttpServlet {
                     psFormateur.executeUpdate();
 
                     conn.commit();
+                    System.out.println("[LOG] Insertion réussie en base pour le formateur ID=" + userId);
 
-                    // Envoi de l'email de vérification
                     boolean emailSent = EmailUtil.sendVerificationEmail(email, prenom + " " + nom, verificationCode);
+                    if (emailSent)
+                        System.out.println("[LOG] Email de vérification envoyé à " + email);
+                    else
+                        System.out.println("[AVERTISSEMENT] Échec de l'envoi de l'email à " + email);
 
-                    if (emailSent) {
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        response.getWriter().write("{\"success\": true, \"message\": \"Formateur ajouté avec succès. Un email de vérification a été envoyé.\"}");
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        response.getWriter().write("{\"success\": true, \"message\": \"Formateur ajouté avec succès, mais l'email de vérification n'a pas pu être envoyé.\"}");
-                    }
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("{\"success\": true, \"message\": \"Formateur ajouté avec succès.\"}");
 
                 } catch (SQLException e) {
                     conn.rollback();
-                    // Suppression des fichiers uploadés en cas d'erreur
-                    deleteUploadedFiles(uploadedFiles, getServletContext().getRealPath("") + File.separator + UPLOAD_DIR);
-
-                    if (e.getMessage().contains("Duplicate entry")) {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        response.getWriter().write("{\"success\": false, \"error\": \"Cet email est déjà utilisé.\"}");
-                    } else {
-                        throw e;
-                    }
+                    deleteUploadedFiles(uploadedFiles, uploadPath);
+                    System.err.println("[ERREUR SQL] " + e.getMessage());
+                    throw e;
                 }
             }
 
         } catch (NumberFormatException e) {
+            System.err.println("[ERREUR] Format numérique invalide : " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"success\": false, \"error\": \"Les années d'expérience et le tarif horaire doivent être des nombres valides.\"}");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\": false, \"error\": \"Erreur lors de l'ajout en base de données: \" + e.getMessage()}");
+            response.getWriter().write("{\"success\": false, \"error\": \"Années d'expérience et tarif horaire invalides.\"}");
         } catch (Exception e) {
+            System.err.println("[ERREUR] Exception inattendue : " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\": false, \"error\": \"Erreur serveur: \" + e.getMessage()}");
+            response.getWriter().write("{\"success\": false, \"error\": \"" + e.getMessage() + "\"}");
         }
+
+      
     }
 
     private String extractFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
-        String[] items = contentDisp.split(";");
-        for (String item : items) {
+        for (String item : contentDisp.split(";")) {
             if (item.trim().startsWith("filename")) {
                 return item.substring(item.indexOf("=") + 2, item.length() - 1);
             }
@@ -203,8 +199,9 @@ public class AddFormateurServlet extends HttpServlet {
         for (String fileName : fileNames) {
             try {
                 Files.deleteIfExists(Paths.get(uploadPath + File.separator + fileName));
+                System.out.println("[LOG] Fichier supprimé suite à rollback : " + fileName);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("[ERREUR] Impossible de supprimer " + fileName + " : " + e.getMessage());
             }
         }
     }
@@ -213,15 +210,11 @@ public class AddFormateurServlet extends HttpServlet {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) hex.append(String.format("%02x", b));
+            return hex.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Erreur lors du hachage du mot de passe", e);
+            throw new RuntimeException(e);
         }
     }
 }
