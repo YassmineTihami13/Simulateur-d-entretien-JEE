@@ -210,12 +210,4 @@ public class RegisterFormateurServlet extends HttpServlet {
             throw new RuntimeException("Erreur lors du hachage du mot de passe", e);
         }
     }
-
-
-    private String getOriginalFileName(String uniqueFileName) {
-        if (uniqueFileName == null || !uniqueFileName.contains("_")) {
-            return uniqueFileName;
-        }
-        return uniqueFileName.substring(uniqueFileName.indexOf("_") + 1);
-    }
 }

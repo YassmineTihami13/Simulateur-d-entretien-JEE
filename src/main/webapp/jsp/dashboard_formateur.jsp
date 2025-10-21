@@ -54,6 +54,12 @@
                         <span>Mes candidats</span>
                     </a>
                 </li>
+                 <li>
+                                   <a href="<%= request.getContextPath() %>/disponibilites" class="nav-link">
+                                       <i class="fas fa-calendar-alt"></i>
+                                       <span>Mes disponibilités</span>
+                                   </a>
+                               </li>
                 <li>
                     <a href="#" class="nav-link">
                         <i class="fas fa-calendar-check"></i>
