@@ -10,6 +10,8 @@ public class Utilisateur {
     private String motDePasse;
     private Role role;
     private LocalDateTime dateCreation;
+    private boolean statut;        // Actif/Inactif (1/0)
+    private boolean estVerifie;    // Vérifié/Non vérifié (1/0)
 
     public enum Role {
         ADMIN, FORMATEUR, CANDIDAT
@@ -29,6 +31,8 @@ public class Utilisateur {
         this.motDePasse = motDePasse;
         this.role = role;
         this.dateCreation = dateCreation != null ? dateCreation : LocalDateTime.now();
+        this.statut = true;        // Actif par défaut
+        this.estVerifie = false;   // Non vérifié par défaut
     }
 
     // Constructeur sans date (utilise la date actuelle)
@@ -57,9 +61,16 @@ public class Utilisateur {
     
     public LocalDateTime getDateCreation() { return dateCreation; }
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
+    
+    public boolean getStatut() { return statut; }
+    public void setStatut(boolean statut) { this.statut = statut; }
+
+    public boolean isEstVerifie() { return estVerifie; }
+    public void setEstVerifie(boolean estVerifie) { this.estVerifie = estVerifie; }
 
     @Override
     public String toString() {
-        return "Utilisateur [id=" + id + ", nom=" + nom + ", prenom=" + prenom + ", email=" + email + ", role=" + role + ", dateCreation=" + dateCreation + "]";
+        return "Utilisateur [id=" + id + ", nom=" + nom + ", prenom=" + prenom + ", email=" + email + ", role=" + role + ", dateCreation=" + dateCreation + ",statut=" + statut +
+                ", estVerifie=" + estVerifie +"]";
     }
 }

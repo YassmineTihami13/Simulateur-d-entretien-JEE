@@ -1,58 +1,25 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.ConnectionBD;
-
+import com.projet.jee.model.Formateur;
+import com.projet.jee.model.Utilisateur;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import javax.servlet.http.HttpSession;
 
-/**
- * Servlet de connexion. Attend "email" et "password" en POST.
- * Hash le password en SHA-256 avant de comparer avec la base.
- */
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    // Méthode utilitaire pour hasher en SHA-256
-    private String hashPassword(String password) {
-        if (password == null) return null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashedBytes = md.digest(password.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashedBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Erreur de hashage SHA-256", e);
-        }
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Rediriger GET vers la page de login
-        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp");
-    }
-
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // S'assurer de l'encodage pour lire correctement les champs
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -62,44 +29,93 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        String hashed = hashPassword(password);
+        try (Connection con = ConnectionBD.getConnection()) {
+            // Hachage du mot de passe
+            String hashedPassword = hashPassword(password);
 
-        String sql = "SELECT id, nom, prenom, role FROM utilisateur WHERE email=? AND motDePasse=?";
-
-        try (Connection con = ConnectionBD.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+            // Requête pour récupérer les informations complètes selon le rôle
+            String sql = "SELECT u.id, u.nom, u.prenom, u.email, u.role, " +
+                        "f.specialite, f.anneeExperience, f.certifications, f.tarifHoraire, f.description " +
+                        "FROM utilisateur u " +
+                        "LEFT JOIN formateur f ON u.id = f.id " +
+                        "WHERE u.email=? AND u.motDePasse=?";
+            
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, email);
-            ps.setString(2, hashed);
+            ps.setString(2, hashedPassword);
+            ResultSet rs = ps.executeQuery();
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    HttpSession session = request.getSession(true);
-                    session.setAttribute("userId", rs.getLong("id"));
-                    session.setAttribute("userNom", rs.getString("nom"));
-                    session.setAttribute("userPrenom", rs.getString("prenom"));
-                    session.setAttribute("userRole", rs.getString("role"));
+            if (rs.next()) {
+                HttpSession session = request.getSession();
+                String role = rs.getString("role");
+                
+                // Stocker les attributs de base
+                session.setAttribute("userId", rs.getLong("id"));
+                session.setAttribute("userNom", rs.getString("nom"));
+                session.setAttribute("userPrenom", rs.getString("prenom"));
+                session.setAttribute("userRole", role);
+                session.setAttribute("userEmail", rs.getString("email"));
 
-                    String role = rs.getString("role");
-                    if ("CANDIDAT".equalsIgnoreCase(role)) {
+                switch (role) {
+                    case "CANDIDAT":
                         response.sendRedirect(request.getContextPath() + "/jsp/condidat.jsp");
-                    } else if ("FORMATEUR".equalsIgnoreCase(role)) {
-                        response.sendRedirect(request.getContextPath() + "/jsp/formateur.jsp");
-                    } else if ("ADMIN".equalsIgnoreCase(role)) {
+                        break;
+                    case "FORMATEUR":
+                        // Créer un objet Formateur complet pour la session
+                        Formateur formateur = createFormateurFromResultSet(rs);
+                        session.setAttribute("formateur", formateur);
+                        response.sendRedirect(request.getContextPath() + "/dashboardFormateur");
+                        break;
+                    case "ADMIN":
                         response.sendRedirect(request.getContextPath() + "/jsp/adminDashboard.jsp");
-                    } else {
-                        // rôle inconnu -> erreur
+                        break;
+                    default:
                         response.sendRedirect(request.getContextPath() + "/jsp/login.jsp?error=invalid");
-                    }
-                } else {
-                    // aucun utilisateur trouvé
-                    response.sendRedirect(request.getContextPath() + "/jsp/login.jsp?error=invalid");
                 }
+
+            } else {
+                response.sendRedirect(request.getContextPath() + "/jsp/login.jsp?error=invalid");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/jsp/login.jsp?error=db");
+        }
+    }
+
+    private Formateur createFormateurFromResultSet(ResultSet rs) {
+        try {
+            Formateur formateur = new Formateur();
+            formateur.setId(rs.getLong("id"));
+            formateur.setNom(rs.getString("nom"));
+            formateur.setPrenom(rs.getString("prenom"));
+            formateur.setEmail(rs.getString("email"));
+            formateur.setRole(Utilisateur.Role.FORMATEUR);
+            formateur.setSpecialite(rs.getString("specialite"));
+            formateur.setAnneeExperience(rs.getInt("anneeExperience"));
+            formateur.setCertifications(rs.getString("certifications"));
+            formateur.setTarifHoraire(rs.getDouble("tarifHoraire"));
+            formateur.setDescription(rs.getString("description"));
+            return formateur;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors du hachage du mot de passe", e);
         }
     }
 }

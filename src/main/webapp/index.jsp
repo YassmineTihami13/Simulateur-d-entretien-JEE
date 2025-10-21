@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InterviewPro - Excellence en Entretiens</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -37,12 +37,12 @@
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
-                        <a class="btn btn-outline-primary btn-sm" href="${pageContext.request.contextPath}/LoginServlet">
+                        <a class="btn btn-outline-primary btn-sm" href="jsp/login.jsp">
                             <i class="fas fa-sign-in-alt me-1"></i>Connexion
                         </a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="btn btn-primary btn-sm glow-button" href="${pageContext.request.contextPath}/registerCandidat">
+                        <a class="btn btn-primary btn-sm glow-button" href="${pageContext.request.contextPath}/registerChoice">
                             <i class="fas fa-user-plus me-2"></i>Inscription
                         </a>
                     </li>
@@ -149,61 +149,7 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2 class="section-title">Technologie Avancée</h2>
-                <p class="section-subtitle">Des outils innovants pour votre réussite</p>
-            </div>
 
-            <div class="row g-5">
-               <div class="col-lg-4">
-    <div class="feature-card feature-card-1" data-aos="fade-up">
-        <div class="feature-icon">
-            <i class="fas fa-chalkboard-teacher"></i>
-        </div>
-        <h4>Simulations Interactives</h4>
-        <p>Entraînez-vous dans des conditions proches du réel avec un retour constructif sur vos performances.</p>
-        <div class="feature-image">
-            <img src="https://qtxasset.com/quartz/qcloud4/media/image/GettyImages-1352734102.jpg?VersionId=er4HA7cFE6k19YqZ8uilCWHJaj7Nl6ek" 
-                 alt="Simulation d'entretien" class="img-fluid rounded">
-        </div>
-    </div>
-</div>
-
-<div class="col-lg-4">
-    <div class="feature-card feature-card-2" data-aos="fade-up" data-aos-delay="100">
-        <div class="feature-icon">
-            <i class="fas fa-chart-line"></i>
-        </div>
-        <h4>Analytics Temps Réel</h4>
-        <p>Suivez votre progression avec des métriques détaillées et des recommandations personnalisées.</p>
-        <div class="feature-image">
-            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                 alt="Analytics" class="img-fluid rounded">
-        </div>
-    </div>
-</div>
-
-<div class="col-lg-4">
-    <div class="feature-card feature-card-3" data-aos="fade-up" data-aos-delay="200">
-        <div class="feature-icon">
-            <i class="fas fa-clipboard-check"></i>
-        </div>
-        <h4>Tests par Domaine</h4>
-        <p>Identifiez vos points forts et les axes à améliorer avant vos entretiens  via des questions ciblées par domaine</p>
-        <div class="feature-image">
-            <img src="https://img.freepik.com/vecteurs-premium/examen-ligne-tests-ligne-ordinateur-portable_186930-1347.jpg" 
-                 alt="Tests par domaine" class="img-fluid rounded">
-        </div>
-    </div>
-</div>
-
-
-            </div>
-        </div>
-    </section>
 
     <!-- Process Section -->
     <section id="process" class="process-section bg-light">
@@ -262,44 +208,45 @@
         </div>
     </section>
 
-    <!-- Stats Section -->p>Emplois décrochés</p>
-                    </div>
+   
+<!-- Stats Section -->
+<section id="stats" class="stats-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item" data-aos="fade-up">
+                    <i class="fas fa-user-graduate"></i>
+                    <h3 class="counter" data-count="95">0</h3>
+                    <p>Taux de réussite aux entretiens</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-clock"></i>
+                    <h3 class="counter" data-count="24">0</h3>
+                    <p>Heures de formation moyenne</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-star"></i>
+                    <h3 class="counter" data-count="4.9">0</h3>
+                    <p>Note moyenne sur 5</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-briefcase"></i>
+                    <h3 class="counter" data-count="1500">0</h3>
+                    <p>Emplois décrochés</p>
                 </div>
             </div>
         </div>
-    </section>
-    <section id="stats" class="stats-section">
-        <div class="container">
-            <div class="row text-center">
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-item" data-aos="fade-up">
-                        <i class="fas fa-user-graduate"></i>
-                        <h3 class="counter" data-count="95">0</h3>
-                        <p>Taux de réussite aux entretiens</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
-                        <i class="fas fa-clock"></i>
-                        <h3 class="counter" data-count="24">0</h3>
-                        <p>Heures de formation moyenne</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
-                        <i class="fas fa-star"></i>
-                        <h3 class="counter" data-count="4.9">0</h3>
-                        <p>Note moyenne sur 5</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
-                        <i class="fas fa-briefcase"></i>
-                        <h3 class="counter" data-count="1500">0</h3>
-                        <
+    </div>
+</section>
     
         <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials-section">
+    <section id="testimonials" class="testimonials-sectionn">
         <div class="container">
             <div class="section-header text-center">
                 <h2 class="section-title">Ils ont transformé leur carrière</h2>

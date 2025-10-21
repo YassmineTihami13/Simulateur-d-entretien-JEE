@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription Candidat</title>
+    <title>Inscription Formateur</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/register-styles.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Inscription Candidat</h1>
-            <p>Rejoignez notre plateforme et préparez-vous aux entretiens</p>
+            <h1>Inscription Formateur</h1>
+            <p>Rejoignez notre plateforme et partagez votre expertise</p>
         </div>
 
         <% if (request.getAttribute("error") != null) { %>
@@ -21,7 +21,7 @@
             </div>
         <% } %>
 
-        <form method="post" action="registerCandidat" id="registerForm" enctype="multipart/form-data">
+        <form method="post" action="register" id="registerForm" enctype="multipart/form-data">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="nom">Nom <span class="required">*</span></label>
@@ -56,9 +56,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="domaineProfessionnel">Domaine Professionnel <span class="required">*</span></label>
-                    <select id="domaineProfessionnel" name="domaineProfessionnel" class="specialty-select" required>
-                        <option value="">Sélectionnez un domaine</option>
+                    <label for="specialite">Spécialité <span class="required">*</span></label>
+                    <select id="specialite" name="specialite" class="specialty-select" required>
+                        <option value="">Sélectionnez une spécialité</option>
                         <option value="INFORMATIQUE">Informatique</option>
                         <option value="MECATRONIQUE">Mécatronique</option>
                         <option value="INTELLIGENCE_ARTIFICIELLE">Intelligence Artificielle</option>
@@ -69,18 +69,36 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="anneeExperience">Années d'expérience <span class="required">*</span></label>
+                    <input type="number" id="anneeExperience" name="anneeExperience" min="0" max="50" required
+                           value="<%= request.getParameter("anneeExperience") != null ? request.getParameter("anneeExperience") : "" %>">
+                </div>
+
+                <div class="form-group">
+                    <label for="tarifHoraire">Tarif horaire (MAD) <span class="required">*</span></label>
+                    <input type="number" id="tarifHoraire" name="tarifHoraire" min="0" step="0.01" required
+                           value="<%= request.getParameter("tarifHoraire") != null ? request.getParameter("tarifHoraire") : "" %>">
+                </div>
+
                 <div class="form-group full-width">
-                    <label for="cv">CV (PDF) <span class="optional">Optionnel</span></label>
+                    <label for="certifications">Certifications (PDF) <span class="optional">Optionnel</span></label>
                     <div class="file-upload-wrapper">
-                        <input type="file" id="cv" name="cv"
-                               accept=".pdf" class="file-input">
-                        <label for="cv" class="file-label">
+                        <input type="file" id="certifications" name="certifications"
+                               accept=".pdf" multiple class="file-input">
+                        <label for="certifications" class="file-label">
                             <span class="file-icon">📄</span>
-                            <span class="file-text">Choisir un fichier PDF</span>
+                            <span class="file-text">Choisir des fichiers PDF</span>
                         </label>
                         <div id="fileList" class="file-list"></div>
                     </div>
-                    <small class="form-hint">Téléchargez votre CV au format PDF (max 10MB)</small>
+                    <small class="form-hint">Vous pouvez sélectionner plusieurs fichiers PDF (max 10MB chacun)</small>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description professionnelle</label>
+                    <textarea id="description" name="description"
+                              placeholder="Présentez votre parcours, vos compétences et votre approche pédagogique..."><%= request.getParameter("description") != null ? request.getParameter("description") : "" %></textarea>
                 </div>
             </div>
 
@@ -91,6 +109,6 @@
         </form>
     </div>
 
-    <script src="${pageContext.request.contextPath}/js/register-candidat-script.js"></script>
+    <script src="${pageContext.request.contextPath}/js/register-script.js"></script>
 </body>
 </html>

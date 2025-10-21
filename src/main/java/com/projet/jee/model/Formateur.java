@@ -1,3 +1,4 @@
+
 package com.projet.jee.model;
 
 public class Formateur extends Utilisateur {
