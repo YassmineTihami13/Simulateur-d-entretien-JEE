@@ -266,236 +266,39 @@ h1 {
     margin-bottom: 0.3rem;
 }
 
-.main-content > p {
-    color: #6b7280;
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-}
-
 .subtitle {
     color: #6b5ce7;
     font-weight: 600;
     font-size: 1rem;
-    margin-top: -1rem;
     margin-bottom: 2rem;
 }
 
 /* ================================
-   📊 CARDS SECTION
+   📊 CARDS SECTION AVEC ICÔNES
 ================================ */
-.cards {
+.cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin: 2rem 0;
 }
 
 .card {
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1.8rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    border-top: 4px solid #6b5ce7;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     position: relative;
-    min-height: 140px;
-}
-
-.card:nth-child(1) {
-    border-top-color: #2dd4bf;
-}
-
-.card:nth-child(2) {
-    border-top-color: #6b5ce7;
-}
-
-.card:nth-child(3) {
-    border-top-color: #f59e0b;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Texte de la carte */
-.card {
-    font-size: 0.95rem;
+    border-top: 4px solid;
+    display: flex;
+    flex-direction: column;
+    min-height: 160px;
+    font-size: 0.85rem;
     color: #6b7280;
-    line-height: 1.5;
-}
-
-/* Nombre dans la carte */
-.card strong {
-    display: block;
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-top: 0.8rem;
-    line-height: 1;
-}
-
-/* Indicateur temps réel */
-.card::after {
-   
-    position: absolute;
-    bottom: 1rem;
-    left: 1.8rem;
-    font-size: 0.7rem;
-    color: #10b981;
-    font-weight: 500;
-}
-
-/* ================================
-   📈 CHART CONTAINER
-================================ */
-.chart-container {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    max-width: 600px;
-    margin: 2rem auto;
-}
-
-.chart-container h2 {
-    font-size: 1.2rem;
     font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 1.5rem;
-}
-
-canvas {
-    max-height: 400px;
-}
-
-/* ================================
-   🎨 ANIMATIONS
-================================ */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.card {
-    animation: fadeIn 0.5s ease-out;
-}
-
-.card:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.card:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.card:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.chart-container {
-    animation: fadeIn 0.5s ease-out 0.4s both;
-}
-
-/* ================================
-   📱 RESPONSIVE DESIGN
-================================ */
-@media (max-width: 1024px) {
-    .sidebar {
-        width: 70px;
-    }
-
-    .sidebar .logo span,
-    .sidebar .nav-title,
-    .sidebar .nav-link span {
-        display: none;
-    }
-
-    .navbar {
-        left: 70px;
-        width: calc(100% - 70px);
-    }
-
-    .main-content {
-        margin-left: 70px;
-    }
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .navbar {
-        left: 0;
-        width: 100%;
-    }
-
-    .main-content {
-        margin-left: 0;
-        padding: 1.5rem;
-    }
-
-    .cards {
-        grid-template-columns: 1fr;
-    }
-
-    .navbar-search {
-        min-width: auto;
-        max-width: 200px;
-    }
-
-    .user-info {
-        display: none;
-    }
-}
-/* ================================
-   🟢 MAIN CONTENT
-================================ */
-.main-content {
-    margin-left: 250px;
-    margin-top: 70px;
-    padding: 2rem;
-    min-height: calc(100vh - 70px);
-}
-
-h1 {
-    font-size: 1.9rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.3rem;
-}
-
-.main-content > p {
-    color: #6b7280;
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-}
-
-/* ================================
-   📊 CARDS SECTION
-================================ */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    border-top: 4px solid #6b5ce7;
-    transition: all 0.2s ease;
-    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 .card:nth-child(1) {
@@ -511,38 +314,68 @@ h1 {
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+/* Ajouter une icône automatiquement avant le texte */
+.card::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+    display: block;
+}
+
+.card:nth-child(1)::before {
+    content: "\f501"; /* fa-user-graduate */
+    color: #2dd4bf;
+}
+
+.card:nth-child(2)::before {
+    content: "\f0c0"; /* fa-users / formateurs */
+    color: #6b5ce7;
+}
+
+.card:nth-child(3)::before {
+    content: "\f508"; /* fa-users-cog / total users */
+    color: #f59e0b;
+}
+
+/* Grand nombre dans la carte */
 .card strong {
     display: block;
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     font-weight: 700;
     color: #1f2937;
-    margin-top: 0.8rem;
+    line-height: 1;
+    margin-top: 0.5rem;
+    margin-bottom: 0.8rem;
 }
 
+/* Texte "Données en temps réel" */
 .card::after {
-     
-    position: absolute;
-    bottom: 1rem;
-    left: 1.5rem;
+    content: "↗️ Données en temps réel";
     font-size: 0.75rem;
     color: #10b981;
     font-weight: 500;
+    margin-top: auto;
+    display: block;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 /* ================================
-   📈 CHART CONTAINER
+   📈 CHART CONTAINER - STYLE DONUT
 ================================ */
 .chart-container {
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     max-width: 600px;
     margin: 2rem auto;
+    position: relative;
 }
 
 .chart-container h2 {
@@ -552,8 +385,95 @@ h1 {
     margin-bottom: 1.5rem;
 }
 
+/* Boutons d'action du graphique */
+.chart-actions {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chart-btn {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 1rem;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-btn:hover {
+    background: #f3f4f6;
+    color: #6b5ce7;
+}
+
+.chart-btn i {
+    font-size: 1rem;
+}
+
+/* Modal pour le zoom plein écran */
+.chart-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    padding: 2rem;
+    overflow: auto;
+}
+
+.chart-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+}
+
+.chart-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.chart-modal-close:hover {
+    background: #dc2626;
+}
+
 canvas {
-    max-height: 400px;
+    max-height: 350px;
+    margin: 0 auto;
+    display: block;
 }
 
 /* ================================
@@ -593,6 +513,12 @@ canvas {
 /* ================================
    📱 RESPONSIVE DESIGN
 ================================ */
+@media (max-width: 1200px) {
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 1024px) {
     .sidebar {
         width: 70px;
@@ -600,7 +526,8 @@ canvas {
 
     .sidebar .logo span,
     .sidebar .nav-title,
-    .sidebar .nav-link span {
+    .sidebar .nav-link span,
+    .formateur-info {
         display: none;
     }
 
@@ -629,7 +556,7 @@ canvas {
         padding: 1.5rem;
     }
 
-    .cards {
+    .cards-container {
         grid-template-columns: 1fr;
     }
 

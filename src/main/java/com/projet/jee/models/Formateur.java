@@ -29,6 +29,11 @@ public class Formateur extends Utilisateur {
             }
             throw new IllegalArgumentException("Aucune spécialité trouvée pour : " + text);
         }
+
+		int toUpperCase() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
     } 
     private Specialite specialite;
     private int anneeExperience;
