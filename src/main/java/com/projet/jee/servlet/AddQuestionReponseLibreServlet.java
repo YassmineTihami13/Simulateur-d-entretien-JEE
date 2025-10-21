@@ -38,7 +38,9 @@ public class AddQuestionReponseLibreServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"success\": false, \"message\": \"Non authentifié\"}");
             return;
-        }
+        }response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
 
         System.out.println("✅ Formateur authentifié : " + formateur.getNom() + " (ID: " + formateur.getId() + ")");
 

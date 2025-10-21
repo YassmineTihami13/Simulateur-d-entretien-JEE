@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import javax.servlet.annotation.MultipartConfig;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 
 @WebServlet("/AddQuestionVraiFaux")
@@ -23,6 +24,9 @@ public class AddQuestionVraiFauxServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         System.out.println("=== [AddQuestionVraiFauxServlet] Début du traitement ===");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
         try {
             HttpSession session = request.getSession(false);
@@ -31,7 +35,7 @@ public class AddQuestionVraiFauxServlet extends HttpServlet {
                 response.getWriter().write("{\"success\":false, \"message\":\"Session expirée.\"}");
                 return;
             }
-
+    
             Formateur formateur = (Formateur) session.getAttribute("formateur");
             if (formateur == null) {
                 System.out.println("[ERREUR] Aucun formateur dans la session !");

@@ -35,7 +35,7 @@ public class ManageQuestionsServlet extends HttpServlet {
             long questionsVraiFaux = questionDAO.getQuestionCountByType(formateur.getId(), "VRAI_FAUX");
             long questionsChoixMultiple = questionDAO.getQuestionCountByType(formateur.getId(), "CHOIX_MULTIPLE");
             long questionsReponse = questionDAO.getQuestionCountByType(formateur.getId(), "REPONSE");
-
+            request.setCharacterEncoding("UTF-8");
             request.setAttribute("totalQuestions", totalQuestions);
             request.setAttribute("questionsVraiFaux", questionsVraiFaux);
             request.setAttribute("questionsChoixMultiple", questionsChoixMultiple);

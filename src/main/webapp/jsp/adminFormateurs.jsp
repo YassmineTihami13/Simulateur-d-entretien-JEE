@@ -14,6 +14,29 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboardAdmin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminFormateurs.css">
     <style>
+    /* Correction du layout principal */
+body {
+    display: grid;
+    grid-template-areas: 
+        "navbar navbar"
+        "sidebar main";
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: 70px 1fr;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.main-content {
+    grid-area: main;
+    margin-left: 100px;
+    width: calc(100% - 280px);
+    padding: 30px;
+    background: var(--gray-50);
+    min-height: calc(100vh - 70px);
+    overflow-y: auto;
+}
+
+
         .certification-item {
             display: flex;
             align-items: center;

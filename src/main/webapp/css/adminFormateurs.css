@@ -1431,8 +1431,45 @@
 }
 .main-content {
     grid-area: main;
-    padding: 100px;
+    padding: 30px;
     background: var(--gray-50);
     overflow-y: auto;
     height: calc(100vh - 70px);
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    /* Assurer que le contenu prend tout l'espace disponible */
+    flex: 1;
+    min-width: 0; /* Important pour le flex/grid */
+}
+
+/* S'assurer que la structure parente prend toute la largeur */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Vérifier la structure grid globale */
+.container {
+    display: grid;
+    grid-template-areas: 
+        "sidebar navbar"
+        "sidebar main";
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: 70px 1fr;
+    height: 100vh;
+    width: 100vw;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    width: 280px;
+    /* ... autres styles ... */
+}
+
+.navbar {
+    grid-area: navbar;
+    /* ... autres styles ... */
 }
