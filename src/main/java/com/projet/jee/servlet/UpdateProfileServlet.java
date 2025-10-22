@@ -38,7 +38,7 @@ public class UpdateProfileServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
-        
+
         // 🔍 DEBUG: Afficher tous les attributs de session
         System.out.println("=== ATTRIBUTS SESSION ===");
         java.util.Enumeration<String> attrNames = session.getAttributeNames();
@@ -46,7 +46,7 @@ public class UpdateProfileServlet extends HttpServlet {
             String name = attrNames.nextElement();
             System.out.println(name + " = " + session.getAttribute(name));
         }
-        
+
         // Récupération de l'ID utilisateur (essayer différents noms d'attributs)
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
@@ -70,10 +70,10 @@ public class UpdateProfileServlet extends HttpServlet {
 
         // Validation des champs
         if (nom == null || nom.trim().isEmpty() ||
-            prenom == null || prenom.trim().isEmpty() ||
-            email == null || email.trim().isEmpty() ||
-            currentPassword == null || currentPassword.trim().isEmpty()) {
-            
+                prenom == null || prenom.trim().isEmpty() ||
+                email == null || email.trim().isEmpty() ||
+                currentPassword == null || currentPassword.trim().isEmpty()) {
+
             sendError(response, "Tous les champs sont obligatoires");
             return;
         }
@@ -116,9 +116,9 @@ public class UpdateProfileServlet extends HttpServlet {
                 out.print("\"email\":\"" + escapeJson(email) + "\"");
                 out.print("}");
                 out.print("}");
-                
+
                 System.out.println("✅ Profil mis à jour pour l'utilisateur ID: " + userId);
-                
+
             } else {
                 sendError(response, "Erreur lors de la mise à jour du profil en base de données");
             }
@@ -139,10 +139,10 @@ public class UpdateProfileServlet extends HttpServlet {
                 if (rs.next()) {
                     String storedHash = rs.getString("motDePasse");
                     String inputHash = hashPassword(password);
-                    
+
                     System.out.println("🔐 Vérification mot de passe - Stored: " + storedHash);
                     System.out.println("🔐 Vérification mot de passe - Input: " + inputHash);
-                    
+
                     return storedHash != null && storedHash.equals(inputHash);
                 }
             }
@@ -184,7 +184,7 @@ public class UpdateProfileServlet extends HttpServlet {
 
             int rowsUpdated = ps.executeUpdate();
             System.out.println("📝 Lignes mises à jour en BD: " + rowsUpdated);
-            
+
             return rowsUpdated > 0;
 
         } catch (Exception e) {

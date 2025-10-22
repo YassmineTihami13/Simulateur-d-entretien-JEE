@@ -1,6 +1,6 @@
 package com.projet.jee.servlet;
 
-import com.projet.jee.model.Administrateur;
+import com.projet.jee.models.Administrateur;
 import com.projet.jee.service.AdminCreator;
 
 import javax.servlet.ServletException;

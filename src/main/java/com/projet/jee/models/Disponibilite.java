@@ -1,4 +1,4 @@
-package com.projet.jee.model;
+package com.projet.jee.models;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

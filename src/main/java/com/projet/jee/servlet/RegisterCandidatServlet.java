@@ -1,7 +1,7 @@
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.ConnectionBD;
-import com.projet.jee.model.Utilisateur;
+import com.projet.jee.models.Utilisateur;
 import com.projet.jee.service.EmailUtil;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;

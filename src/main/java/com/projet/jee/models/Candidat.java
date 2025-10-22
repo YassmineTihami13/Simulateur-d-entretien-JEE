@@ -1,4 +1,4 @@
-package com.projet.jee.model;
+package com.projet.jee.models;
 
 public class Candidat extends Utilisateur {
 
@@ -97,9 +97,20 @@ public class Candidat extends Utilisateur {
         return cv != null && !cv.trim().isEmpty();
     }
 
+    public String getCvDownloadUrl() {
+        if (cv == null || cv.isEmpty()) {
+            return null;
+        }
+        try {
+            return "/view-cv?file=" + java.net.URLEncoder.encode(cv, "UTF-8");
+        } catch (Exception e) {
+            return "/view-cv?file=" + cv;
+        }
+    }
+    
     @Override
     public String toString() {
-        return super.toString() + " Candidat [domaineProfessionnel=" + getDomaineProfessionnelDisplayName() + 
-               ", cv=" + cv + "]";
+        return super.toString() + " Candidat [domaineProfessionnel=" + getDomaineProfessionnelDisplayName() +
+                ", cv=" + cv + "]";
     }
 }

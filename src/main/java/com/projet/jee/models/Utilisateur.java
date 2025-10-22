@@ -1,4 +1,4 @@
-package com.projet.jee.model;
+package com.projet.jee.models;
 
 import java.time.LocalDateTime;
 
@@ -43,25 +43,25 @@ public class Utilisateur {
     // Getters et Setters
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
-    
+
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
-    
+
     public String getPrenom() { return prenom; }
     public void setPrenom(String prenom) { this.prenom = prenom; }
-    
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    
+
     public String getMotDePasse() { return motDePasse; }
     public void setMotDePasse(String motDePasse) { this.motDePasse = motDePasse; }
-    
+
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
-    
+
     public LocalDateTime getDateCreation() { return dateCreation; }
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
-    
+
     public boolean getStatut() { return statut; }
     public void setStatut(boolean statut) { this.statut = statut; }
 

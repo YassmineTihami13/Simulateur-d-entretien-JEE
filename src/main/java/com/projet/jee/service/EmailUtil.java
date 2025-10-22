@@ -97,8 +97,8 @@ public class EmailUtil {
                 "</body>" +
                 "</html>";
     }
-    
-    
+
+
     public static boolean sendVerificationEmailCandidat(String toEmail, String userName, String verificationCode) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -176,15 +176,15 @@ public class EmailUtil {
                 "</body>" +
                 "</html>";
     }
-    
- // Dans com.projet.jee.service.EmailUtil (déjà existant)
-    public static boolean sendReservationAcceptedEmail(String toEmail, String candidatName, String formateurName, com.projet.jee.model.Reservation reservation) {
+
+    // Dans com.projet.jee.service.EmailUtil (déjà existant)
+    public static boolean sendReservationAcceptedEmail(String toEmail, String candidatName, String formateurName, com.projet.jee.models.Reservation reservation) {
         String subject = "Votre réservation a été acceptée";
         String html = buildReservationAcceptedTemplate(candidatName, formateurName, reservation);
         return sendHtmlEmail(toEmail, subject, html);
     }
 
-    public static boolean sendReservationRejectedEmail(String toEmail, String candidatName, String formateurName, com.projet.jee.model.Reservation reservation, String reason) {
+    public static boolean sendReservationRejectedEmail(String toEmail, String candidatName, String formateurName, com.projet.jee.models.Reservation reservation, String reason) {
         String subject = "Votre réservation a été refusée";
         String html = buildReservationRejectedTemplate(candidatName, formateurName, reservation, reason);
         return sendHtmlEmail(toEmail, subject, html);
@@ -222,30 +222,30 @@ public class EmailUtil {
     }
 
     /* Templates simples (tu peux styliser comme tu veux) */
-    private static String buildReservationAcceptedTemplate(String candidatName, String formateurName, com.projet.jee.model.Reservation r) {
+    private static String buildReservationAcceptedTemplate(String candidatName, String formateurName, com.projet.jee.models.Reservation r) {
         String date = r.getDateReservation() != null ? r.getDateReservation().toString() : "-";
         return "<html><body>" +
-               "<h2>Bonjour " + candidatName + ",</h2>" +
-               "<p>Bonne nouvelle — votre réservation a été <strong>acceptée</strong> par " + formateurName + ".</p>" +
-               "<p><strong>Détails :</strong><br/>" +
-               "Date : " + date + "<br/>" +
-               "Durée : " + r.getDuree() + " heure(s)<br/>" +
-               "Prix : " + r.getPrix() + " MAD</p>" +
-               "<p>Nous vous souhaitons un excellent entretien.</p>" +
-               "<p>Cordialement,<br/>L'équipe InterviewPro</p>" +
-               "</body></html>";
+                "<h2>Bonjour " + candidatName + ",</h2>" +
+                "<p>Bonne nouvelle — votre réservation a été <strong>acceptée</strong> par " + formateurName + ".</p>" +
+                "<p><strong>Détails :</strong><br/>" +
+                "Date : " + date + "<br/>" +
+                "Durée : " + r.getDuree() + " heure(s)<br/>" +
+                "Prix : " + r.getPrix() + " MAD</p>" +
+                "<p>Nous vous souhaitons un excellent entretien.</p>" +
+                "<p>Cordialement,<br/>L'équipe InterviewPro</p>" +
+                "</body></html>";
     }
 
-    private static String buildReservationRejectedTemplate(String candidatName, String formateurName, com.projet.jee.model.Reservation r, String reason) {
+    private static String buildReservationRejectedTemplate(String candidatName, String formateurName, com.projet.jee.models.Reservation r, String reason) {
         String date = r.getDateReservation() != null ? r.getDateReservation().toString() : "-";
         return "<html><body>" +
-               "<h2>Bonjour " + candidatName + ",</h2>" +
-               "<p>Nous sommes désolés — votre réservation pour le " + date + " a été <strong>refusée</strong> par " + formateurName + ".</p>" +
-               "<p><strong>Raison :</strong> " + reason + "</p>" +
-               "<p>N'hésitez pas à proposer un autre créneau.</p>" +
-               "<p>Cordialement,<br/>L'équipe InterviewPro</p>" +
-               "</body></html>";
+                "<h2>Bonjour " + candidatName + ",</h2>" +
+                "<p>Nous sommes désolés — votre réservation pour le " + date + " a été <strong>refusée</strong> par " + formateurName + ".</p>" +
+                "<p><strong>Raison :</strong> " + reason + "</p>" +
+                "<p>N'hésitez pas à proposer un autre créneau.</p>" +
+                "<p>Cordialement,<br/>L'équipe InterviewPro</p>" +
+                "</body></html>";
     }
 
-    
+
 }

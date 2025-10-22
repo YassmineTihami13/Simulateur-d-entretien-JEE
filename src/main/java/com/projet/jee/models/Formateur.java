@@ -1,5 +1,4 @@
-
-package com.projet.jee.model;
+package com.projet.jee.models;
 
 public class Formateur extends Utilisateur {
 
@@ -13,7 +12,7 @@ public class Formateur extends Utilisateur {
         GENIE_CIVIL("Génie Civil");
 
         private final String displayName;
-
+          
         Specialite(String displayName) {
             this.displayName = displayName;
         }
@@ -30,8 +29,12 @@ public class Formateur extends Utilisateur {
             }
             throw new IllegalArgumentException("Aucune spécialité trouvée pour : " + text);
         }
-    }
 
+		int toUpperCase() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+    } 
     private Specialite specialite;
     private int anneeExperience;
     private String certifications;
@@ -128,4 +131,5 @@ public class Formateur extends Utilisateur {
                 ", anneeExperience=" + anneeExperience +
                 ", tarifHoraire=" + tarifHoraire + " MAD]";
     }
+
 }

@@ -763,7 +763,7 @@ body {
 }
 
 /* Testimonials Section */
-.testimonials-section {
+.testimonials-sectionn {
     padding: 100px 0;
     background: var(--light-bg);
 }
@@ -930,4 +930,32 @@ body {
     .newsletter-form {
         flex-direction: column;
     }
+}
+/* Stats Section */
+.stats-section {
+    padding: 80px 0;
+    background: var(--gradient-primary);
+    color: var(--white);
+}
+
+.stat-item {
+    padding: 2rem;
+}
+
+.stat-item i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.stat-item h3 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.stat-item p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
 }
