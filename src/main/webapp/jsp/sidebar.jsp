@@ -37,7 +37,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link">
+                 <a href="<%= contextPath %>/admin/candidats" class="nav-link">
                     <i class="fas fa-user-graduate"></i>
                     <span>Candidats</span>
                 </a>

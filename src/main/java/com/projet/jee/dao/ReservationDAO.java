@@ -1,94 +1,188 @@
 package com.projet.jee.dao;
 
+import com.projet.jee.models.Reservation;
+import com.projet.jee.models.ReservationDetails;
+import com.projet.jee.models.Reservation.Statut;
+
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import com.projet.jee.models.Reservation;
 
 public class ReservationDAO {
 
-    public List<Reservation> getAllReservations() {
-        List<Reservation> reservations = new ArrayList<>();
-
-        String query = "SELECT r.id, r.dateReservation, r.duree, r.prix, r.statut, " +
-                "uc.nom AS candidat_nom, uc.prenom AS candidat_prenom, " +
-                "uf.nom AS formateur_nom, uf.prenom AS formateur_prenom " +
-                "FROM reservation r " +
-                "LEFT JOIN candidat c ON r.candidat_id = c.id " +
-                "LEFT JOIN utilisateur uc ON c.id = uc.id " +
-                "LEFT JOIN formateur f ON r.formateur_id = f.id " +
-                "LEFT JOIN utilisateur uf ON f.id = uf.id " +
-                "ORDER BY r.dateReservation DESC";
-
-        System.out.println("🔍 Exécution de la requête SQL...");
-
-        try (Connection con = ConnectionBD.getConnection();
-             PreparedStatement ps = con.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
-
-            int count = 0;
-            while (rs.next()) {
-                Reservation r = new Reservation();
-                r.setId(rs.getLong("id"));
-                r.setDateReservation(rs.getDate("dateReservation"));
-                r.setDuree(rs.getDouble("duree"));
-                r.setPrix(rs.getDouble("prix"));
-                r.setStatut(rs.getString("statut"));
-
-                String candidatNom = rs.getString("candidat_nom");
-                String candidatPrenom = rs.getString("candidat_prenom");
-                r.setCandidatNom((candidatNom != null ? candidatNom : "Inconnu") + " " +
-                        (candidatPrenom != null ? candidatPrenom : ""));
-
-                String formateurNom = rs.getString("formateur_nom");
-                String formateurPrenom = rs.getString("formateur_prenom");
-                r.setFormateurNom((formateurNom != null ? formateurNom : "Inconnu") + " " +
-                        (formateurPrenom != null ? formateurPrenom : ""));
-
-                reservations.add(r);
-                count++;
-
-                System.out.println("✅ Réservation #" + r.getId() + ": " + r.getCandidatNom() + " -> " + r.getFormateurNom());
-            }
-
-            System.out.println("📊 Total réservations récupérées: " + count);
-
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL dans getAllReservations:");
-            e.printStackTrace();
+    private Statut statutFromDb(String dbValue) {
+        if (dbValue == null) return null;
+        switch (dbValue.toUpperCase()) {
+            case "EN_ATTENTE": return Statut.EN_ATTENTE;
+            case "CONFIRMEE":  return Statut.ACCEPTEE;
+            case "REFUSEE":    return Statut.REFUSEE;
+            default: return null;
         }
+    }
 
-        return reservations;
+    private String statutToDb(Statut s) {
+        if (s == null) return null;
+        switch (s) {
+            case EN_ATTENTE: return "EN_ATTENTE";
+            case ACCEPTEE:   return "CONFIRMEE";
+            case REFUSEE:    return "REFUSEE";
+            default: return s.name();
+        }
     }
 
     /**
-     * Supprime une réservation par son ID
-     * @param id L'identifiant de la réservation à supprimer
-     * @return true si la suppression a réussi, false sinon
+     * Récupère toutes les réservations avec détails complets pour un formateur
      */
-    public boolean deleteReservation(Long id) {
-        String query = "DELETE FROM reservation WHERE id = ?";
+    public List<ReservationDetails> getReservationsDetailsByFormateurId(long formateurId) throws SQLException {
+        List<ReservationDetails> list = new ArrayList<>();
+        String sql = "SELECT r.id, r.dateReservation, r.duree, r.prix, r.statut, " +
+                "r.candidat_id, r.formateur_id, " +
+                "u.nom, u.prenom, u.email, " +
+                "c.cv " +
+                "FROM reservation r " +
+                "INNER JOIN utilisateur u ON r.candidat_id = u.id " +
+                "INNER JOIN candidat c ON u.id = c.id " +
+                "WHERE r.formateur_id = ? " +
+                "ORDER BY r.dateReservation DESC, r.id DESC";
 
-        System.out.println("🗑️ Tentative de suppression de la réservation #" + id);
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try (Connection con = ConnectionBD.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, formateurId);
 
-            ps.setLong(1, id);
-            int rowsAffected = ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ReservationDetails rd = new ReservationDetails();
 
-            if (rowsAffected > 0) {
-                System.out.println("✅ Réservation #" + id + " supprimée avec succès");
-                return true;
-            } else {
-                System.out.println("⚠️ Aucune réservation trouvée avec l'ID #" + id);
-                return false;
+                    // Informations de base de la réservation
+                    rd.setId(rs.getLong("id"));
+
+                    Date dateResa = rs.getDate("dateReservation");
+                    if (dateResa != null) {
+                        rd.setDateReservation(dateResa.toLocalDate());
+                    }
+
+                    rd.setDuree(rs.getDouble("duree"));
+                    rd.setPrix(rs.getDouble("prix"));
+                    rd.setCandidatId(rs.getLong("candidat_id"));
+                    rd.setFormateurId(rs.getLong("formateur_id"));
+
+                    // Informations du candidat
+                    rd.setCandidatNom(rs.getString("nom"));
+                    rd.setCandidatPrenom(rs.getString("prenom"));
+                    rd.setCandidatEmail(rs.getString("email"));
+                    rd.setCv(rs.getString("cv"));
+
+                    // Statut
+                    String statutStr = rs.getString("statut");
+                    if (statutStr != null) {
+                        Statut st = statutFromDb(statutStr);
+                        rd.setStatut(st != null ? st : Statut.EN_ATTENTE);
+                    } else {
+                        rd.setStatut(Statut.EN_ATTENTE);
+                    }
+
+                    list.add(rd);
+                }
             }
-
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL lors de la suppression de la réservation #" + id);
-            e.printStackTrace();
-            return false;
         }
+        return list;
+    }
+
+    /**
+     * Récupère toutes les réservations liées à un formateur (ordre décroissant)
+     */
+    public List<Reservation> getReservationsByFormateurId(long formateurId) throws SQLException {
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT id, dateReservation, duree, prix, candidat_id, formateur_id, statut " +
+                "FROM reservation WHERE formateur_id = ? ORDER BY dateReservation DESC, id DESC";
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, formateurId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Reservation r = new Reservation();
+                    r.setId(rs.getLong("id"));
+                    Date d = rs.getDate("dateReservation");
+                    if (d != null) r.setDateReservation(d.toLocalDate());
+                    r.setDuree(rs.getDouble("duree"));
+                    r.setPrix(rs.getDouble("prix"));
+                    r.setCandidatId(rs.getLong("candidat_id"));
+                    r.setFormateurId(rs.getLong("formateur_id"));
+
+                    String statutStr = rs.getString("statut");
+                    if (statutStr != null) {
+                        Statut st = statutFromDb(statutStr);
+                        r.setStatut(st != null ? st : Statut.EN_ATTENTE);
+                    }
+                    list.add(r);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Met à jour le statut d'une réservation.
+     */
+    public boolean updateReservationStatus(long reservationId, Statut nouveauStatut, String rejectionReason) throws SQLException {
+        String sql = "UPDATE reservation SET statut = ? WHERE id = ?";
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, statutToDb(nouveauStatut));
+            ps.setLong(2, reservationId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Récupère l'email et le nom du candidat pour une réservation donnée
+     */
+    public String[] getCandidatContactByReservationId(long reservationId) throws SQLException {
+        String sql = "SELECT u.email, u.prenom, u.nom FROM utilisateur u " +
+                "INNER JOIN reservation r ON u.id = r.candidat_id WHERE r.id = ?";
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, reservationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String email = rs.getString("email");
+                    String prenom = rs.getString("prenom");
+                    String nom = rs.getString("nom");
+                    return new String[]{ email, prenom + " " + nom };
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Récupère les détails d'une réservation
+     */
+    public Reservation getReservationById(long id) throws SQLException {
+        String sql = "SELECT id, dateReservation, duree, prix, candidat_id, formateur_id, statut " +
+                "FROM reservation WHERE id = ?";
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Reservation r = new Reservation();
+                    r.setId(rs.getLong("id"));
+                    Date d = rs.getDate("dateReservation");
+                    if (d != null) r.setDateReservation(d.toLocalDate());
+                    r.setDuree(rs.getDouble("duree"));
+                    r.setPrix(rs.getDouble("prix"));
+                    r.setCandidatId(rs.getLong("candidat_id"));
+                    r.setFormateurId(rs.getLong("formateur_id"));
+
+                    String statutStr = rs.getString("statut");
+                    if (statutStr != null) r.setStatut(statutFromDb(statutStr));
+                    return r;
+                }
+            }
+        }
+        return null;
     }
 }

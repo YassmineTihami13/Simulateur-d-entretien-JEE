@@ -1,102 +1,123 @@
-// register-script.js
-document.addEventListener('DOMContentLoaded', function() {
-    // Gestion de l'upload de fichiers
-    const fileInput = document.getElementById('certifications');
-    const fileList = document.getElementById('fileList');
-    
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            fileList.innerHTML = '';
-            const files = Array.from(e.target.files);
-            
-            files.forEach((file, index) => {
-                if (file.type === 'application/pdf') {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <span class="file-name">${file.name}</span>
-                        <span class="file-remove" data-index="${index}">×</span>
-                    `;
-                    fileList.appendChild(fileItem);
-                }
-            });
+const passwordInput = document.getElementById('motDePasse');
+const strengthBar = document.getElementById('strengthBar');
+const strengthText = document.getElementById('strengthText');
+const fileInput = document.getElementById('certifications');
+const fileList = document.getElementById('fileList');
 
-            // Ajouter les écouteurs d'événements pour la suppression
-            document.querySelectorAll('.file-remove').forEach(removeBtn => {
-                removeBtn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    const dt = new DataTransfer();
-                    const files = Array.from(fileInput.files);
-                    
-                    files.splice(index, 1);
-                    files.forEach(file => dt.items.add(file));
-                    fileInput.files = dt.files;
-                    
-                    // Relancer l'événement change pour mettre à jour l'affichage
-                    fileInput.dispatchEvent(new Event('change'));
-                });
-            });
-        });
+passwordInput.addEventListener('input', function() {
+    const password = this.value;
+    let strength = 0;
+
+    if (password.length >= 8) strength++;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+    if (password.match(/[0-9]/)) strength++;
+    if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+    strengthBar.className = 'strength-bar-fill';
+
+    if (strength <= 1) {
+        strengthBar.classList.add('strength-weak');
+        strengthText.textContent = 'Mot de passe faible';
+        strengthText.style.color = '#ff6b6b';
+    } else if (strength <= 3) {
+        strengthBar.classList.add('strength-medium');
+        strengthText.textContent = 'Mot de passe moyen';
+        strengthText.style.color = '#ffb74d';
+    } else {
+        strengthBar.classList.add('strength-strong');
+        strengthText.textContent = 'Mot de passe fort';
+        strengthText.style.color = '#66bb6a';
+    }
+});
+
+fileInput.addEventListener('change', function(e) {
+    fileList.innerHTML = '';
+    const files = Array.from(this.files);
+
+    if (files.length === 0) {
+        return;
     }
 
-    // Force du mot de passe
-    const passwordInput = document.getElementById('motDePasse');
-    const strengthBar = document.getElementById('strengthBar');
-    const strengthText = document.getElementById('strengthText');
+    files.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
 
-    if (passwordInput && strengthBar && strengthText) {
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            const strength = calculatePasswordStrength(password);
-            
-            strengthBar.className = 'strength-bar-fill';
-            strengthBar.classList.add(strength.class);
-            strengthText.textContent = strength.text;
-            strengthText.style.color = strength.color;
-        });
-    }
+        const fileInfo = document.createElement('div');
+        fileInfo.className = 'file-info';
 
-    function calculatePasswordStrength(password) {
-        let score = 0;
-        
-        if (password.length >= 8) score++;
-        if (password.match(/[a-z]/)) score++;
-        if (password.match(/[A-Z]/)) score++;
-        if (password.match(/[0-9]/)) score++;
-        if (password.match(/[^a-zA-Z0-9]/)) score++;
-        
-        switch(score) {
-            case 0:
-            case 1:
-                return { class: 'strength-weak', text: 'Faible', color: '#ff6b6b' };
-            case 2:
-            case 3:
-                return { class: 'strength-medium', text: 'Moyen', color: '#ffb74d' };
-            case 4:
-            case 5:
-                return { class: 'strength-strong', text: 'Fort', color: '#66bb6a' };
-            default:
-                return { class: '', text: '', color: '' };
+        const fileName = document.createElement('span');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+
+        const fileSize = document.createElement('span');
+        fileSize.className = 'file-size';
+        fileSize.textContent = formatFileSize(file.size);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-file-btn';
+        removeBtn.innerHTML = '✕';
+        removeBtn.onclick = function() {
+            removeFile(index);
+        };
+
+        fileInfo.appendChild(fileName);
+        fileInfo.appendChild(fileSize);
+        fileItem.appendChild(fileInfo);
+        fileItem.appendChild(removeBtn);
+        fileList.appendChild(fileItem);
+    });
+});
+
+function removeFile(index) {
+    const dt = new DataTransfer();
+    const files = Array.from(fileInput.files);
+
+    files.forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
         }
+    });
+
+    fileInput.files = dt.files;
+    fileInput.dispatchEvent(new Event('change'));
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('motDePasse').value;
+    const confirmPassword = document.getElementById('confirmMotDePasse').value;
+
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Les mots de passe ne correspondent pas !');
+        return false;
     }
 
-    // Validation du formulaire
-    const form = document.getElementById('registerForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const password = document.getElementById('motDePasse').value;
-            const confirmPassword = document.getElementById('confirmMotDePasse').value;
-            
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Les mots de passe ne correspondent pas.');
-                return;
-            }
-            
-            // Animation de soumission
-            const submitBtn = form.querySelector('.btn-primary');
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inscription en cours...';
-            submitBtn.disabled = true;
-        });
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('Le mot de passe doit contenir au moins 6 caractères !');
+        return false;
+    }
+
+    const files = Array.from(fileInput.files);
+    for (let file of files) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            e.preventDefault();
+            alert('Seuls les fichiers PDF sont acceptés pour les certifications !');
+            return false;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            e.preventDefault();
+            alert('Chaque fichier ne doit pas dépasser 10MB !');
+            return false;
+        }
     }
 });

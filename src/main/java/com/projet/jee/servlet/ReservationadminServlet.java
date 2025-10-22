@@ -7,10 +7,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 import com.projet.jee.dao.ReservationDAO;
+import com.projet.jee.dao.ReservationadminDAO;
 import com.projet.jee.models.Reservation;
 
 @WebServlet("/admin/reservations")
-public class ReservationServlet extends HttpServlet {
+public class ReservationadminServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -25,9 +26,9 @@ public class ReservationServlet extends HttpServlet {
             if (idParam != null && !idParam.isEmpty()) {
                 try {
                     Long id = Long.parseLong(idParam);
-                    ReservationDAO dao = new ReservationDAO();
+                    ReservationadminDAO dao = new ReservationadminDAO();
                     boolean deleted = dao.deleteReservation(id);
-                    
+
                     if (deleted) {
                         System.out.println("✅ Réservation supprimée, redirection...");
                     } else {
@@ -42,7 +43,7 @@ public class ReservationServlet extends HttpServlet {
         }
 
         // Affichage normal de la liste
-        ReservationDAO dao = new ReservationDAO();
+        ReservationadminDAO dao = new ReservationadminDAO();
         List<Reservation> reservations = dao.getAllReservations();
 
         request.setAttribute("reservations", reservations);

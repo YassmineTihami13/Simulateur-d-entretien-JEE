@@ -51,17 +51,21 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("userPrenom", prenom);
                 session.setAttribute("userRole", role);
 
-                if ("FORMATEUR".equals(role)) {
+                 if ("FORMATEUR".equals(role)) {
                     // Récupérer les infos supplémentaires du formateur
                     DashboardFormateurDAO dao = new DashboardFormateurDAO();
                     Formateur formateur = dao.getFormateurById(userId); 
                     session.setAttribute("formateur", formateur);
-
+                    session.setAttribute("formateurId", userId);
                     // Rediriger vers la servlet qui prépare le dashboard
                     response.sendRedirect(request.getContextPath() + "/dashboardFormateur");
-                }
- else if ("CANDIDAT".equals(role)) {
-                    response.sendRedirect(request.getContextPath() + "/jsp/condidat.jsp");
+                    
+                }  else if ("CANDIDAT".equals(role)) {
+                    // Enregistrer l'ID du candidat dans la session
+                    session.setAttribute("candidatId", userId);
+                    // Rediriger vers la servlet du dashboard candidat
+                    response.sendRedirect(request.getContextPath() + "/candidat/dashboard");
+                    
                 } else if ("ADMIN".equals(role)) {
                     response.sendRedirect(request.getContextPath() + "/jsp/adminDashboard.jsp");
                 } else {

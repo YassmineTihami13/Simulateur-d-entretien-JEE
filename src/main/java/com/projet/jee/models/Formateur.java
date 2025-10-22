@@ -1,5 +1,9 @@
 package com.projet.jee.models;
 
+
+import java.util.List;
+import java.util.ArrayList;
+
 public class Formateur extends Utilisateur {
 
     public enum Specialite {
@@ -40,6 +44,7 @@ public class Formateur extends Utilisateur {
     private String certifications;
     private double tarifHoraire;
     private String description;
+    private List<Disponibilite> disponibilites = new ArrayList<>();
 
     public Formateur() {}
 
@@ -130,6 +135,27 @@ public class Formateur extends Utilisateur {
         return super.toString() + " Formateur [specialite=" + getSpecialiteDisplayName() +
                 ", anneeExperience=" + anneeExperience +
                 ", tarifHoraire=" + tarifHoraire + " MAD]";
+    }
+    
+    
+    
+    
+   
+
+   
+
+    public List<Disponibilite> getDisponibilites() {
+        return disponibilites;
+    }
+
+    public void setDisponibilites(List<Disponibilite> disponibilites) {
+        this.disponibilites = disponibilites;
+    }
+
+    public void addDisponibilite(Disponibilite dispo) {
+        if (dispo != null) {
+            this.disponibilites.add(dispo);
+        }
     }
 
 }

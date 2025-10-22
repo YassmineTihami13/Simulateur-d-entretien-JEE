@@ -9,6 +9,8 @@ import java.util.List;
 
 public class FormateurDAO {
 
+
+
     public List<Formateur> getAllFormateurs() throws SQLException {
         List<Formateur> formateurs = new ArrayList<>();
         String sql = "SELECT u.id, u.nom, u.prenom, u.email, u.role, u.statut, " +
@@ -140,4 +142,6 @@ public class FormateurDAO {
             }
         }
     }
+    
+    
 }

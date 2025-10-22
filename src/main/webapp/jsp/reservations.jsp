@@ -132,22 +132,39 @@
                         <td style="padding: 12px;"><%= r.getCandidatNom() %></td>
                         <td style="padding: 12px;"><%= r.getFormateurNom() %></td>
                         <td style="padding: 12px;">
-                            <% 
-                                String statut = r.getStatut();
-                                String bgColor = "";
-                                String textColor = "";
-                                
-                                if ("ACCEPTEE".equals(statut)) {
-                                    bgColor = "#D1FAE5";
-                                    textColor = "#065F46";
-                                } else if ("REFUSEE".equals(statut)) {
-                                    bgColor = "#FEE2E2";
-                                    textColor = "#991B1B";
-                                } else {
-                                    bgColor = "#FEF3C7";
-                                    textColor = "#92400E";
-                                }
-                            %>
+         
+         
+          <%
+    // récupération du statut (enum) depuis l'objet Reservation r
+    Reservation.Statut statut = r.getStatut();
+
+    // valeurs par défaut
+    String bgColor = "#FEF3C7";
+    String textColor = "#92400E";
+
+    // définir les couleurs selon le statut
+    if (statut == Reservation.Statut.ACCEPTEE) {
+        bgColor = "#D1FAE5";
+        textColor = "#065F46";
+    } else if (statut == Reservation.Statut.REFUSEE) {
+        bgColor = "#FEE2E2";
+        textColor = "#991B1B";
+    } // sinon on garde la valeur par défaut (EN_ATTENTE)
+%>
+
+<span style="
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: <%= bgColor %>;
+    color: <%= textColor %>;
+    display: inline-block;
+">
+    <%= r.getStatutDisplayName() %>
+</span>
+
+
                             <span style="
                                 padding: 6px 12px;
                                 border-radius: 12px;
@@ -207,7 +224,7 @@
     </main>
 
     <!-- Rightbar -->
-    <%@ include file="rightbaradmin.jsp" %>
+    
 
     <!-- Modal de détails -->
     <div id="detailsModal" style="
