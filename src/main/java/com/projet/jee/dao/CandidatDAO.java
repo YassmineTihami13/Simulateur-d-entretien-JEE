@@ -24,17 +24,7 @@ public class CandidatDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Candidat candidat = new Candidat();
-                candidat.setId(rs.getLong("id"));
-                candidat.setNom(rs.getString("nom"));
-                candidat.setPrenom(rs.getString("prenom"));
-                candidat.setEmail(rs.getString("email"));
-                candidat.setRole(Utilisateur.Role.valueOf(rs.getString("role")));
-                candidat.setStatut(rs.getBoolean("statut"));
-                candidat.setEstVerifie(rs.getBoolean("estVerifie"));
-                candidat.setDomaineProfessionnel(rs.getString("domaineProfessionnel"));
-                candidat.setCv(rs.getString("cv"));
-
+                Candidat candidat = createCandidatFromResultSet(rs);
                 candidats.add(candidat);
             }
         }
@@ -54,22 +44,40 @@ public class CandidatDAO {
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Candidat candidat = new Candidat();
-                    candidat.setId(rs.getLong("id"));
-                    candidat.setNom(rs.getString("nom"));
-                    candidat.setPrenom(rs.getString("prenom"));
-                    candidat.setEmail(rs.getString("email"));
-                    candidat.setRole(Utilisateur.Role.valueOf(rs.getString("role")));
-                    candidat.setStatut(rs.getBoolean("statut"));
-                    candidat.setEstVerifie(rs.getBoolean("estVerifie"));
-                    candidat.setDomaineProfessionnel(rs.getString("domaineProfessionnel"));
-                    candidat.setCv(rs.getString("cv"));
-
-                    return candidat;
+                    return createCandidatFromResultSet(rs);
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Crée un objet Candidat à partir d'un ResultSet
+     */
+    private Candidat createCandidatFromResultSet(ResultSet rs) throws SQLException {
+        Candidat candidat = new Candidat();
+        candidat.setId(rs.getLong("id"));
+        candidat.setNom(rs.getString("nom"));
+        candidat.setPrenom(rs.getString("prenom"));
+        candidat.setEmail(rs.getString("email"));
+        candidat.setRole(Utilisateur.Role.valueOf(rs.getString("role")));
+        candidat.setStatut(rs.getBoolean("statut"));
+        candidat.setEstVerifie(rs.getBoolean("estVerifie"));
+
+        // Conversion String -> Enum DomaineProfessionnel
+        String domaineProfessionnelStr = rs.getString("domaineProfessionnel");
+        if (domaineProfessionnelStr != null && !domaineProfessionnelStr.isEmpty()) {
+            try {
+                candidat.setDomaineProfessionnel(domaineProfessionnelStr);
+            } catch (IllegalArgumentException e) {
+                // Si le domaine n'est pas valide, on le laisse à null
+                System.err.println("Domaine professionnel invalide pour le candidat " +
+                        candidat.getId() + ": " + domaineProfessionnelStr);
+            }
+        }
+
+        candidat.setCv(rs.getString("cv"));
+        return candidat;
     }
 
     public boolean toggleCandidatStatus(long candidatId, boolean newStatus) throws SQLException {
@@ -129,7 +137,8 @@ public class CandidatDAO {
             String sqlCandidat = "UPDATE candidat SET domaineProfessionnel = ?, cv = ? WHERE id = ?";
 
             stmtCandidat = conn.prepareStatement(sqlCandidat);
-            stmtCandidat.setString(1, candidat.getDomaineProfessionnel());
+            // Stockage du nom de l'enum dans la BD (ex: "INFORMATIQUE")
+            stmtCandidat.setString(1, candidat.getDomaineProfessionnelEnumName());
             stmtCandidat.setString(2, candidat.getCv());
             stmtCandidat.setLong(3, candidat.getId());
 

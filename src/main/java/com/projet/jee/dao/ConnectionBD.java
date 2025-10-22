@@ -13,6 +13,7 @@ public class ConnectionBD {
     static {
         try (InputStream in = ConnectionBD.class.getClassLoader().getResourceAsStream("config.properties")) {
             props.load(in);
+            // Chargement explicite du driver MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (Exception e) {
             e.printStackTrace();

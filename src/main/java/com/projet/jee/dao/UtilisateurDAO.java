@@ -1,7 +1,7 @@
-
 package com.projet.jee.dao;
 
 import com.projet.jee.models.Candidat;
+import com.projet.jee.models.Utilisateur;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -55,7 +55,6 @@ public class UtilisateurDAO {
             stmtUser.setBoolean(7, false); // non vérifié par défaut
 
             int affectedRows = stmtUser.executeUpdate();
-
             if (affectedRows == 0) {
                 conn.rollback();
                 return false;
@@ -74,10 +73,11 @@ public class UtilisateurDAO {
 
             // 2. Insérer dans la table candidat
             String sqlCandidat = "INSERT INTO candidat (id, domaineProfessionnel, cv) VALUES (?, ?, ?)";
-
             stmtCandidat = conn.prepareStatement(sqlCandidat);
             stmtCandidat.setLong(1, userId);
-            stmtCandidat.setString(2, candidat.getDomaineProfessionnel());
+
+            // Ici, on utilise l'enum pour obtenir la valeur String correcte
+            stmtCandidat.setString(2, candidat.getDomaineProfessionnelEnumName());
             stmtCandidat.setString(3, candidat.getCv());
 
             stmtCandidat.executeUpdate();
@@ -88,11 +88,7 @@ public class UtilisateurDAO {
 
         } catch (SQLException e) {
             if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
             throw e;
         } finally {

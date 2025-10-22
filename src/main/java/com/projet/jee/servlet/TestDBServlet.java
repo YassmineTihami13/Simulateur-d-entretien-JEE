@@ -19,7 +19,7 @@ public class TestDBServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try (Connection con = ConnectionBD.getConnection()) {
-            out.println("<h1>Connexion à la DB réussie ! 🎉</h1>");
+            out.println("<h1>Connexion à la DB réussie kkl ! 🎉</h1>");
         } catch (SQLException e) {
             out.println("<h1>Erreur de connexion : " + e.getMessage() + "</h1>");
         }

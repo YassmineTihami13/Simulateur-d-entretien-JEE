@@ -2,6 +2,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,7 +12,93 @@
     <title>Gestion des Formateurs | InterviewPro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboardAdmin.css">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminFormateurs.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminFormateurs.css">
+    <style>
+    /* Correction du layout principal */
+body {
+    display: grid;
+    grid-template-areas: 
+        "navbar navbar"
+        "sidebar main";
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: 70px 1fr;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.main-content {
+    grid-area: main;
+    margin-left: 100px;
+    width: calc(100% - 280px);
+    padding: 30px;
+    background: var(--gray-50);
+    min-height: calc(100vh - 70px);
+    overflow-y: auto;
+}
+
+
+        .certification-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .certification-item:hover {
+            background-color: #f8fafc;
+            border-color: #3b82f6;
+        }
+        
+        .certification-name {
+            flex: 1;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .certification-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-view-certificate {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-view-certificate:hover {
+            background: #2563eb;
+        }
+        
+        .no-certifications {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+        
+        .certifications-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .certification-status {
+            background: #10B981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -68,7 +156,7 @@
                     </a>
                 </li>
                 <li>
-    <a href="${pageContext.request.contextPath}/admin/candidats" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fas fa-user-graduate"></i>
                         <span>Candidats</span>
                     </a>
@@ -120,10 +208,10 @@
                 <p>Consultez et gérez les formateurs de la plateforme</p>
             </div>
             <div class="action-buttons">
-                <a href="${pageContext.request.contextPath}/register" class="btn-add">
+                <button class="btn-add" onclick="openAddModal()">
                     <i class="fas fa-plus"></i>
                     Ajouter un Formateur
-                </a>
+                </button>
             </div>
         </div>
 
@@ -158,7 +246,7 @@
                         <c:set var="moyenneExp" value="${moyenneExp + formateur.anneeExperience}" />
                     </c:forEach>
                     <c:if test="${formateurs.size() > 0}">
-                        ${moyenneExp / formateurs.size()}
+                        <fmt:formatNumber value="${moyenneExp / formateurs.size()}" pattern="#.##" />
                     </c:if>
                     <c:if test="${formateurs.size() == 0}">0</c:if>
                 </div>
@@ -242,12 +330,16 @@
                                             </button>
                                             <c:choose>
                                                 <c:when test="${formateur.statut}">
-                                                    <button class="btn-action btn-deactivate" onclick="toggleFormateurStatus(${formateur.id}, false)" title="Désactiver">
+                                                    <button class="btn-action btn-deactivate"
+                                                            onclick="toggleFormateurStatus(${formateur.id}, '${formateur.prenom} ${formateur.nom}', false)"
+                                                            title="Désactiver">
                                                         <i class="fas fa-ban"></i>
                                                     </button>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <button class="btn-action btn-activate" onclick="toggleFormateurStatus(${formateur.id}, true)" title="Activer">
+                                                    <button class="btn-action btn-activate"
+                                                            onclick="toggleFormateurStatus(${formateur.id}, '${formateur.prenom} ${formateur.nom}', true)"
+                                                            title="Activer">
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                 </c:otherwise>
@@ -341,6 +433,171 @@
             </div>
         </div>
     </div>
+
+<!-- Modal d'ajout de formateur -->
+<div id="addFormateurModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Ajouter un Formateur</h3>
+            <button class="modal-close" onclick="closeAddModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addFormateurForm" class="edit-form" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addNom">Nom *</label>
+                        <input type="text" id="addNom" name="nom" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="addPrenom">Prénom *</label>
+                        <input type="text" id="addPrenom" name="prenom" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="addEmail">Email *</label>
+                    <input type="email" id="addEmail" name="email" required class="form-input">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addMotDePasse">Mot de passe *</label>
+                        <input type="password" id="addMotDePasse" name="motDePasse" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="addConfirmMotDePasse">Confirmer le mot de passe *</label>
+                        <input type="password" id="addConfirmMotDePasse" name="confirmMotDePasse" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addSpecialite">Spécialité *</label>
+                        <select id="addSpecialite" name="specialite" required class="form-select">
+                            <option value="">Sélectionnez une spécialité</option>
+                            <option value="INFORMATIQUE">Informatique</option>
+                            <option value="MECATRONIQUE">Mécatronique</option>
+                            <option value="INTELLIGENCE_ARTIFICIELLE">Intelligence Artificielle</option>
+                            <option value="CYBERSECURITE">Cybersécurité</option>
+                            <option value="GSTR">GSTR</option>
+                            <option value="SUPPLY_CHAIN_MANAGEMENT">Supply Chain Management</option>
+                            <option value="GENIE_CIVIL">Génie Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addAnneeExperience">Années d'expérience *</label>
+                        <input type="number" id="addAnneeExperience" name="anneeExperience" min="0" max="50" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addTarifHoraire">Tarif Horaire (MAD) *</label>
+                        <input type="number" id="addTarifHoraire" name="tarifHoraire" min="0" step="0.01" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="addCertifications">Certifications (PDF)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="addCertifications" name="certifications"
+                               accept=".pdf" multiple class="file-input">
+                        <label for="addCertifications" class="file-label">
+                            <span class="file-icon">📄</span>
+                            <span class="file-text">Choisir des fichiers PDF</span>
+                        </label>
+                        <div id="addFileList" class="file-lista"></div>
+                    </div>
+                    <small class="form-hint">Vous pouvez sélectionner plusieurs fichiers PDF (max 10MB chacun)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="addDescription">Description</label>
+                    <textarea id="addDescription" name="description" rows="4"
+                              placeholder="Description du formateur..." class="form-textarea"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" onclick="closeAddModal()">Annuler</button>
+            <button type="button" class="btn btn-primary" onclick="submitAddForm()">
+                <i class="fas fa-plus"></i> Ajouter le Formateur
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Modal de modification du formateur -->
+<div id="editFormateurModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Modifier le Formateur</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editFormateurForm" class="edit-form">
+                <input type="hidden" id="editFormateurId" name="id">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editNom">Nom *</label>
+                        <input type="text" id="editNom" name="nom" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPrenom">Prénom *</label>
+                        <input type="text" id="editPrenom" name="prenom" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editEmail">Email *</label>
+                    <input type="email" id="editEmail" name="email" required class="form-input">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editSpecialite">Spécialité *</label>
+                        <select id="editSpecialite" name="specialite" required class="form-select">
+                            <option value="">Sélectionnez une spécialité</option>
+                            <option value="INFORMATIQUE">Informatique</option>
+                            <option value="MECATRONIQUE">Mécatronique</option>
+                            <option value="INTELLIGENCE_ARTIFICIELLE">Intelligence Artificielle</option>
+                            <option value="CYBERSECURITE">Cybersécurité</option>
+                            <option value="GSTR">GSTR</option>
+                            <option value="SUPPLY_CHAIN_MANAGEMENT">Supply Chain Management</option>
+                            <option value="GENIE_CIVIL">Génie Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAnneeExperience">Années d'expérience *</label>
+                        <input type="number" id="editAnneeExperience" name="anneeExperience" min="0" max="50" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTarifHoraire">Tarif Horaire (MAD) *</label>
+                        <input type="number" id="editTarifHoraire" name="tarifHoraire" min="0" step="0.01" required class="form-input">
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+                    <textarea id="editDescription" name="description" rows="4"
+                              placeholder="Description du formateur..." class="form-textarea"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" onclick="closeEditModal()">Annuler</button>
+            <button type="button" class="btn btn-primary" onclick="submitEditForm()">
+                <i class="fas fa-save"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+</div>
+
     <!-- Modal de confirmation pour activation/désactivation -->
     <div id="statusModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 500px;">
@@ -355,9 +612,6 @@
                     </div>
                     <div class="status-message" id="statusModalMessage">
                         <!-- Message sera ajouté dynamiquement -->
-                    </div>
-                    <div class="formateur-info" id="statusFormateurInfo">
-                        <!-- Info formateur sera ajoutée dynamiquement -->
                     </div>
                 </div>
             </div>
@@ -392,13 +646,18 @@
     </div>
 
     <script>
+        // Variables globales pour stocker les données temporaires
+        let currentFormateurId = null;
+        let currentNewStatus = null;
+        let currentFormateurName = null;
+
         // Fonction pour afficher les détails du formateur
         function viewFormateur(formateurId) {
             const modal = document.getElementById('formateurModal');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const formateurDetails = document.getElementById('formateurDetails');
             const errorMessage = document.getElementById('errorMessage');
-            
+
             // Afficher le modal et le spinner
             modal.style.display = 'flex';
             loadingSpinner.style.display = 'block';
@@ -416,21 +675,21 @@
                 .then(data => {
                     // Cacher le spinner et afficher les détails
                     loadingSpinner.style.display = 'none';
-                    
+
                     if (data.error) {
                         throw new Error(data.error);
                     }
-                    
+
                     // Remplir les données du formateur
-                    document.getElementById('formateurAvatarLarge').textContent = 
+                    document.getElementById('formateurAvatarLarge').textContent =
                         data.prenom.charAt(0) + data.nom.charAt(0);
-                    document.getElementById('formateurNomComplet').textContent = 
+                    document.getElementById('formateurNomComplet').textContent =
                         data.prenom + ' ' + data.nom;
                     document.getElementById('formateurEmail').textContent = data.email;
                     document.getElementById('formateurSpecialite').textContent = data.specialiteDisplayName;
                     document.getElementById('formateurExperience').textContent = data.anneeExperience + ' ans';
                     document.getElementById('formateurTarif').textContent = data.tarifHoraire + ' MAD';
-                    
+
                     // Gérer la description
                     const descriptionElement = document.getElementById('formateurDescription');
                     if (data.description && data.description.trim() !== '') {
@@ -440,25 +699,28 @@
                         descriptionElement.innerHTML = '<em>Aucune description fournie</em>';
                     }
 
-                    // Gérer les certifications - AFFICHAGE SEULEMENT SANS TÉLÉCHARGEMENT
-                    const certificationsList = document.getElementById('certificationsList');
-                    certificationsList.innerHTML = '';
+                    // Gérer les certifications
+      const certificationsList = document.getElementById('certificationsList');
+                         certificationsList.innerHTML = '';
+                         console.log("Données certifications reçues:", data.certifications);
+                         console.log("hasCertifications:", data.hasCertifications);
+                         if (data.hasCertifications && data.certifications && data.certifications.length > 0) {
+                             data.certifications.forEach(certification => {
+                                 const certItem = document.createElement('div');
+                                 certItem.className = 'certification-item';
 
-                    if (data.hasCertifications && data.certifications && data.certifications.length > 0) {
-                        data.certifications.forEach(certification => {
-                            const certItem = document.createElement('div');
-                            certItem.className = 'certification-item';
-                            
-                            // Extraire le nom original du fichier (sans le préfixe UUID)
-                            const originalFileName = certification.substring(certification.indexOf('_') + 1);
-                            
-                            // AFFICHAGE SIMPLE SANS BOUTON DE TÉLÉCHARGEMENT
-                            certItem.innerHTML = `
-                                <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 8px;"></i>
-                                <span class="certification-name">\${originalFileName}</span>
-                                <span class="certification-status" style="background: #10B981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 8px;">
-                                    Disponible
-                                </span>
+                                 // Extraire le nom original du fichier
+                                 const originalFileName = certification.substring(certification.indexOf('_') + 1);
+                                 console.log(`Nom original pour ${index}:`, originalFileName);
+                                 certItem.innerHTML = `
+                                     <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 8px;"></i>
+                                     <span class="certification-name">\${originalFileName}</span>
+                          
+                                <div class="certification-actions">
+                                    <button class="btn-view-certificate" onclick="viewCertificate('\${certification}')">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </button>
+                                </div>
                             `;
                             certificationsList.appendChild(certItem);
                         });
@@ -482,196 +744,558 @@
                 });
         }
 
-        // Fonction pour fermer le modal
+     // Fonction corrigée pour visualiser un certificat
+// Fonction corrigée pour visualiser un certificat
+function viewCertificate(storedFileName) {
+    console.log("=== DEBUG viewCertificate ===");
+    console.log("Paramètre brut:", storedFileName);
+    
+    if (!storedFileName || storedFileName.trim() === '') {
+        console.error("ERREUR: Nom de fichier invalide");
+        alert("Impossible d'ouvrir le certificat : nom de fichier manquant");
+        return;
+    }
+
+    const cleanFileName = storedFileName.trim();
+    const encodedFileName = encodeURIComponent(cleanFileName);
+    
+    // CORRECTION ICI : Utilisation correcte de l'interpolation
+    const contextPath = '${pageContext.request.contextPath}'; // Cette variable doit être définie
+    const url = contextPath + '/view-certificate?file=' + encodedFileName;
+    
+    console.log("URL complète:", url);
+    
+    // Validation finale
+    if (url.includes('file=') && !url.endsWith('file=')) {
+        window.open(url, '_blank');
+    } else {
+        console.error("ERREUR: URL mal formée - fichier manquant");
+        alert("Erreur technique : impossible de générer l'URL du certificat");
+    }
+}
+
+        // Fonction pour fermer le modal des détails
         function closeModal() {
             document.getElementById('formateurModal').style.display = 'none';
         }
 
-        // Fermer le modal en cliquant à l'extérieur
-        document.getElementById('formateurModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Fonction pour changer le statut du formateur
-// Variables globales pour stocker les données temporaires
-let currentFormateurId = null;
-let currentNewStatus = null;
-let currentFormateurData = null;
-
-// Fonction pour ouvrir le modal de confirmation
-function toggleFormateurStatus(formateurId, newStatus) {
-    currentFormateurId = formateurId;
-    currentNewStatus = newStatus;
-
-    // Trouver les données du formateur dans la liste
-    const formateurRow = document.querySelector(`tr:has(button[onclick*="${formateurId}"])`);
-    const formateurNom = formateurRow.querySelector('.user-details h4').textContent;
-    const formateurEmail = formateurRow.querySelector('.user-details p').textContent;
-    const formateurSpecialite = formateurRow.querySelector('.specialite-badge').textContent;
-
-    currentFormateurData = {
-        nomComplet: formateurNom,
-        email: formateurEmail,
-        specialite: formateurSpecialite
-    };
-
-    // Configurer le modal selon l'action
-    const modal = document.getElementById('statusModal');
-    const title = document.getElementById('statusModalTitle');
-    const icon = document.getElementById('statusModalIcon');
-    const message = document.getElementById('statusModalMessage');
-    const formateurInfo = document.getElementById('statusFormateurInfo');
-    const confirmBtn = document.getElementById('confirmStatusBtn');
-
-    if (newStatus) {
-        // Activation
-        title.textContent = 'Activer le Formateur';
-        icon.className = 'status-icon activate';
-        icon.innerHTML = '<i class="fas fa-check-circle"></i>';
-        message.textContent = 'Voulez-vous activer ce formateur ?';
-        confirmBtn.className = 'btn btn-confirm activate';
-        confirmBtn.innerHTML = '<i class="fas fa-check"></i> Activer';
-    } else {
-        // Désactivation
-        title.textContent = 'Désactiver le Formateur';
-        icon.className = 'status-icon deactivate';
-        icon.innerHTML = '<i class="fas fa-ban"></i>';
-        message.textContent = 'Voulez-vous désactiver ce formateur ?';
-        confirmBtn.className = 'btn btn-confirm deactivate';
-        confirmBtn.innerHTML = '<i class="fas fa-ban"></i> Désactiver';
-    }
-
-    // Afficher les informations du formateur
-    formateurInfo.innerHTML = `
-        <h4>${formateurNom}</h4>
-        <p><strong>Email:</strong> ${formateurEmail}</p>
-        <p><strong>Spécialité:</strong> ${formateurSpecialite}</p>
-    `;
-
-    // Afficher le modal
-    modal.style.display = 'flex';
-
-    // Configurer le bouton de confirmation
-    confirmBtn.onclick = confirmStatusChange;
-}
-
-// Fonction pour confirmer le changement de statut
-function confirmStatusChange() {
-    const modal = document.getElementById('statusModal');
-    modal.style.display = 'none';
-
-    // Afficher un indicateur de chargement
-    showLoading('Traitement en cours...');
-
-    // Faire l'appel AJAX pour changer le statut
-    fetch('${pageContext.request.contextPath}/admin/toggle-formateur-status?id=' + currentFormateurId + '&status=' + currentNewStatus, {
-        method: 'POST'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur lors de la modification du statut');
-        }
-        return response.json();
-    })
-    .then(data => {
-        hideLoading();
-
-        if (data.success) {
-            showResultModal(
-                'success',
-                currentNewStatus ? 'Formateur activé avec succès' : 'Formateur désactivé avec succès',
-                `Le formateur <strong>${currentFormateurData.nomComplet}</strong> a été ${currentNewStatus ? 'activé' : 'désactivé'} avec succès.`
-            );
-        } else {
-            throw new Error(data.error || 'Erreur inconnue');
-        }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Erreur:', error);
-        showResultModal(
-            'error',
-            'Erreur',
-            `Une erreur est survenue lors de la modification du statut: ${error.message}`
-        );
-    });
-}
-
-// Fonction pour afficher le modal de résultat
-function showResultModal(type, title, message) {
-    const modal = document.getElementById('resultModal');
-    const modalTitle = document.getElementById('resultModalTitle');
-    const icon = document.getElementById('resultModalIcon');
-    const messageElement = document.getElementById('resultModalMessage');
-
-    modalTitle.textContent = title;
-
-    if (type === 'success') {
-        icon.className = 'result-icon success';
-        icon.innerHTML = '<i class="fas fa-check-circle"></i>';
-    } else {
-        icon.className = 'result-icon error';
-        icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
-    }
-
-    messageElement.innerHTML = message;
-    modal.style.display = 'flex';
-}
-
-// Fonctions pour fermer les modals
-function closeStatusModal() {
-    document.getElementById('statusModal').style.display = 'none';
-    currentFormateurId = null;
-    currentNewStatus = null;
-    currentFormateurData = null;
-}
-
-function closeResultModal() {
-    document.getElementById('resultModal').style.display = 'none';
-    // Recharger la page pour voir les changements
-    location.reload();
-}
-
-// Fonctions pour l'indicateur de chargement
-function showLoading(message) {
-    // Vous pouvez implémenter un overlay de chargement ici
-    console.log('Chargement:', message);
-}
-
-function hideLoading() {
-    // Cacher l'indicateur de chargement
-    console.log('Chargement terminé');
-}
-
-// Fermer les modals en cliquant à l'extérieur
-document.getElementById('statusModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeStatusModal();
-    }
-});
-
-document.getElementById('resultModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeResultModal();
-    }
-});
-
-        // Fonctions existantes...
+        // Fonction pour ouvrir le modal d'édition
         function editFormateur(formateurId) {
-            alert('Modifier formateur: ' + formateurId);
-            // Implémentation à venir
+            currentFormateurId = formateurId;
+            const modal = document.getElementById('editFormateurModal');
+
+            // Afficher le modal
+            modal.style.display = 'flex';
+
+            // Charger les données du formateur
+            loadFormateurData(formateurId);
         }
 
-        // Recherche en temps réel
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('.table tbody tr');
+        // Fonction pour charger les données du formateur
+        function loadFormateurData(formateurId) {
+            console.log('Chargement des données pour formateur ID:', formateurId);
             
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
+                .then(response => {
+                    console.log('Réponse HTTP:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Données complètes reçues:', data);
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Debug des propriétés de spécialité
+                    console.log('specialite:', data.specialite);
+                    console.log('specialiteEnumName:', data.specialiteEnumName);
+                    console.log('specialiteDisplayName:', data.specialiteDisplayName);
+
+                    // Essayer différentes propriétés possibles
+                    const specialiteValue = data.specialite || data.specialiteEnumName || data.specialiteDisplayName;
+                    console.log('Valeur de spécialité à utiliser:', specialiteValue);
+
+                    document.getElementById('editFormateurId').value = data.id;
+                    document.getElementById('editNom').value = data.nom;
+                    document.getElementById('editPrenom').value = data.prenom;
+                    document.getElementById('editEmail').value = data.email;
+                    document.getElementById('editSpecialite').value = specialiteValue;
+                    document.getElementById('editAnneeExperience').value = data.anneeExperience;
+                    document.getElementById('editTarifHoraire').value = data.tarifHoraire;
+                    document.getElementById('editDescription').value = data.description || '';
+
+                    // Vérifier si la valeur a été correctement définie
+                    const selectElement = document.getElementById('editSpecialite');
+                    console.log('Option sélectionnée après assignation:', selectElement.value);
+                    console.log('Options disponibles:', Array.from(selectElement.options).map(opt => opt.value));
+                })
+                .catch(error => {
+                    console.error('Erreur détaillée:', error);
+                    alert('Erreur lors du chargement des données: ' + error.message);
+                });
+        }
+
+        // Fonction pour soumettre le formulaire de modification
+        function submitEditForm() {
+            const form = document.getElementById('editFormateurForm');
+            const formData = new FormData(form);
+
+            // Validation côté client
+            const nom = document.getElementById('editNom').value.trim();
+            const prenom = document.getElementById('editPrenom').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const specialite = document.getElementById('editSpecialite').value;
+            const anneeExperience = document.getElementById('editAnneeExperience').value;
+            const tarifHoraire = document.getElementById('editTarifHoraire').value;
+
+            if (!nom || !prenom || !email || !specialite || !anneeExperience || !tarifHoraire) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Veuillez remplir tous les champs obligatoires (*)'
+                );
+                return;
+            }
+
+            // Afficher un indicateur de chargement
+            showLoading('Modification en cours...');
+
+            // Envoyer les données
+            fetch('${pageContext.request.contextPath}/admin/update-formateur', {
+                method: 'POST',
+                body: new URLSearchParams(formData) // Utiliser URLSearchParams au lieu de FormData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    closeEditModal();
+                    showResultModal(
+                        'success',
+                        'Succès',
+                        data.message || 'Le formateur a été modifié avec succès.'
+                    );
+                } else {
+                    showResultModal(
+                        'error',
+                        'Erreur',
+                        data.error || 'Une erreur est survenue lors de la modification.'
+                    );
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Erreur:', error);
+                showResultModal(
+                    'error',
+                    'Erreur',
+                    'Une erreur est survenue lors de la communication avec le serveur.'
+                );
+            });
+        }
+
+        // Fonction pour fermer la modal de modification
+        function closeEditModal() {
+            document.getElementById('editFormateurModal').style.display = 'none';
+            document.getElementById('editFormateurForm').reset();
+        }
+
+        // Fonction pour ouvrir le modal de confirmation de statut
+        function toggleFormateurStatus(formateurId, formateurName, newStatus) {
+            currentFormateurId = formateurId;
+            currentNewStatus = newStatus;
+            currentFormateurName = formateurName;
+
+            // Configurer le modal selon l'action
+            const modal = document.getElementById('statusModal');
+            const title = document.getElementById('statusModalTitle');
+            const icon = document.getElementById('statusModalIcon');
+            const message = document.getElementById('statusModalMessage');
+            const confirmBtn = document.getElementById('confirmStatusBtn');
+
+            if (newStatus) {
+                // Activation
+                title.textContent = 'Activer le Formateur';
+                icon.className = 'status-icon activate';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                message.textContent = `Voulez-vous activer le formateur "${formateurName}" ?`;
+                confirmBtn.className = 'btn btn-confirm activate';
+                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Activer';
+            } else {
+                // Désactivation
+                title.textContent = 'Désactiver le Formateur';
+                icon.className = 'status-icon deactivate';
+                icon.innerHTML = '<i class="fas fa-ban"></i>';
+                message.textContent = `Voulez-vous désactiver le formateur "${formateurName}" ?`;
+                confirmBtn.className = 'btn btn-confirm deactivate';
+                confirmBtn.innerHTML = '<i class="fas fa-ban"></i> Désactiver';
+            }
+
+            // Afficher le modal
+            modal.style.display = 'flex';
+
+            // Configurer le bouton de confirmation
+            confirmBtn.onclick = confirmStatusChange;
+        }
+
+        // Fonction pour ouvrir le modal d'ajout
+        function openAddModal() {
+            document.getElementById('addFormateurModal').style.display = 'flex';
+            document.getElementById('addFormateurForm').reset();
+            document.getElementById('addFileList').innerHTML = '';
+        }
+
+        // Fonction pour fermer le modal d'ajout
+        function closeAddModal() {
+            document.getElementById('addFormateurModal').style.display = 'none';
+        }
+
+        // Fonction pour soumettre le formulaire d'ajout
+        function submitAddForm() {
+            const form = document.getElementById('addFormateurForm');
+            const formData = new FormData(form);
+
+            // Validation côté client
+            const nom = document.getElementById('addNom').value.trim();
+            const prenom = document.getElementById('addPrenom').value.trim();
+            const email = document.getElementById('addEmail').value.trim();
+            const motDePasse = document.getElementById('addMotDePasse').value;
+            const confirmMotDePasse = document.getElementById('addConfirmMotDePasse').value;
+            const specialite = document.getElementById('addSpecialite').value;
+            const anneeExperience = document.getElementById('addAnneeExperience').value;
+            const tarifHoraire = document.getElementById('addTarifHoraire').value;
+
+            // Validation des champs obligatoires
+            if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse ||
+                !specialite || !anneeExperience || !tarifHoraire) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Veuillez remplir tous les champs obligatoires (*)'
+                );
+                return;
+            }
+
+            // Validation du mot de passe
+            if (motDePasse !== confirmMotDePasse) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Les mots de passe ne correspondent pas'
+                );
+                return;
+            }
+
+            // Validation des nombres
+            if (isNaN(anneeExperience) || anneeExperience < 0) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'L\'année d\'expérience doit être un nombre valide'
+                );
+                return;
+            }
+
+            if (isNaN(tarifHoraire) || tarifHoraire < 0) {
+                showResultModal(
+                    'error',
+                    'Erreur de validation',
+                    'Le tarif horaire doit être un nombre valide'
+                );
+                return;
+            }
+
+            // Afficher un indicateur de chargement
+            showLoading('Ajout du formateur en cours...');
+
+            // Envoyer les données
+            fetch('${pageContext.request.contextPath}/admin/add-formateur', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Statut HTTP:', response.status);
+                if (!response.ok) {
+                    throw new Error('Erreur réseau: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                console.log('Réponse du serveur:', data);
+                if (data.success) {
+                    closeAddModal();
+                    showResultModal(
+                        'success',
+                        'Succès',
+                        data.message || 'Le formateur a été ajouté avec succès.'
+                    );
+                } else {
+                    showResultModal(
+                        'error',
+                        'Erreur',
+                        data.error || 'Une erreur est survenue lors de l\'ajout.'
+                    );
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Erreur détaillée:', error);
+                showResultModal(
+                    'error',
+                    'Erreur',
+                    'Une erreur est survenue lors de l\'ajout: ' + error.message
+                );
+            });
+        }
+
+        // Gestion de l'affichage des fichiers sélectionnés
+// Gestion de l'affichage des fichiers sélectionnés
+document.getElementById('addCertifications').addEventListener('change', function(e) {
+    const fileList = document.getElementById('addFileList');
+    fileList.innerHTML = '';
+
+    console.log('Fichiers sélectionnés:', this.files); // Pour déboguer
+
+    Array.from(this.files).forEach(file => {
+        console.log('Fichier:', file.name, 'Type:', file.type); // Débogage
+        
+        if (file.type === 'application/pdf') {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <i class="fas fa-file-pdf" style="color: #e74c3c;"></i>
+                <span style="margin-left: 8px; color: black;">${file.name}</span>
+            `;
+            fileList.appendChild(fileItem);
+        } else {
+            console.warn('Fichier non-PDF ignoré:', file.name);
+        }
+    });
+
+    // Vérifier si la liste est vide après traitement
+    if (fileList.children.length === 0) {
+        fileList.innerHTML = '<p style="color: #999;">Aucun fichier PDF sélectionné</p>';
+    }
+});
+
+        // Fonction pour confirmer le changement de statut
+        function confirmStatusChange() {
+            const modal = document.getElementById('statusModal');
+            modal.style.display = 'none';
+
+            // Afficher un indicateur de chargement
+            showLoading('Traitement en cours...');
+
+            // Faire l'appel AJAX pour changer le statut
+            fetch('${pageContext.request.contextPath}/admin/toggle-formateur-status?id=' + currentFormateurId + '&status=' + currentNewStatus, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la modification du statut');
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+
+                if (data.success) {
+                    showResultModal(
+                        'success',
+                        currentNewStatus ? 'Formateur activé avec succès' : 'Formateur désactivé avec succès',
+                        `Le formateur <strong>${currentFormateurName}</strong> a été ${currentNewStatus ? 'activé' : 'désactivé'} avec succès.`
+                    );
+                } else {
+                    throw new Error(data.error || 'Erreur inconnue');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Erreur:', error);
+                showResultModal(
+                    'error',
+                    'Erreur',
+                    `Une erreur est survenue lors de la modification du statut: ${error.message}`
+                );
+            });
+        }
+
+        // Fonction pour afficher le modal de résultat
+        function showResultModal(type, title, message) {
+            const modal = document.getElementById('resultModal');
+            const modalTitle = document.getElementById('resultModalTitle');
+            const icon = document.getElementById('resultModalIcon');
+            const messageElement = document.getElementById('resultModalMessage');
+
+            modalTitle.textContent = title;
+
+            if (type === 'success') {
+                icon.className = 'result-icon success';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else {
+                icon.className = 'result-icon error';
+                icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            }
+
+            messageElement.innerHTML = message;
+            modal.style.display = 'flex';
+        }
+
+        // Fonctions pour fermer les modals
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+            currentFormateurId = null;
+            currentNewStatus = null;
+            currentFormateurName = null;
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            // Recharger la page pour voir les changements
+            location.reload();
+        }
+
+        // Fonction pour charger les données du formateur avec l'enum
+        function loadFormateurData(formateurId) {
+            console.log('Chargement des données pour formateur ID:', formateurId);
+            
+            fetch('${pageContext.request.contextPath}/admin/formateur-details?id=' + formateurId)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Données chargées pour édition:', data);
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Remplir le formulaire
+                    document.getElementById('editFormateurId').value = data.id;
+                    document.getElementById('editNom').value = data.nom;
+                    document.getElementById('editPrenom').value = data.prenom;
+                    document.getElementById('editEmail').value = data.email;
+                    
+                    // CORRECTION : Utiliser specialiteDisplayName et mapper vers les valeurs du select
+                    const specialiteDisplayName = data.specialiteDisplayName;
+                    console.log('SpecialiteDisplayName:', specialiteDisplayName);
+                    
+                    // Mapper le nom d'affichage vers la valeur enum
+                    const specialiteValue = mapDisplayNameToEnum(specialiteDisplayName);
+                    console.log('Valeur enum mappée:', specialiteValue);
+                    
+                    document.getElementById('editSpecialite').value = specialiteValue;
+                    document.getElementById('editAnneeExperience').value = data.anneeExperience;
+                    document.getElementById('editTarifHoraire').value = data.tarifHoraire;
+                    document.getElementById('editDescription').value = data.description || '';
+
+                    // Vérification finale
+                    console.log('Valeur sélectionnée dans le select:', document.getElementById('editSpecialite').value);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors du chargement des données: ' + error.message);
+                });
+        }
+
+        // Fonction pour mapper le nom d'affichage vers la valeur enum
+        function mapDisplayNameToEnum(displayName) {
+            const mapping = {
+                'Informatique': 'INFORMATIQUE',
+                'Mécatronique': 'MECATRONIQUE',
+                'Intelligence Artificielle': 'INTELLIGENCE_ARTIFICIELLE',
+                'Cybersécurité': 'CYBERSECURITE',
+                'GSTR': 'GSTR',
+                'Supply Chain Management': 'SUPPLY_CHAIN_MANAGEMENT',
+                'Génie Civil': 'GENIE_CIVIL'
+            };
+            
+            return mapping[displayName] || '';
+        }
+
+        // Fonctions pour l'indicateur de chargement
+        function showLoading(message) {
+            // Créer un overlay de chargement si il n'existe pas
+            let loadingOverlay = document.getElementById('loadingOverlay');
+            if (!loadingOverlay) {
+                loadingOverlay = document.createElement('div');
+                loadingOverlay.id = 'loadingOverlay';
+                loadingOverlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                    color: white;
+                `;
+                loadingOverlay.innerHTML = `
+                    <div style="background: white; color: black; padding: 20px; border-radius: 8px; text-align: center;">
+                        <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 0 auto 10px;"></div>
+                        <p>${message}</p>
+                    </div>
+                `;
+                document.body.appendChild(loadingOverlay);
+            } else {
+                loadingOverlay.style.display = 'flex';
+            }
+        }
+
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        // Fermer les modals en cliquant à l'extérieur
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal détails
+            document.getElementById('formateurModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Modal statut
+            document.getElementById('statusModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeStatusModal();
+                }
+            });
+
+            // Modal résultat
+            document.getElementById('resultModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeResultModal();
+                }
+            });
+
+            // Modal édition
+            document.getElementById('editFormateurModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditModal();
+                }
+            });
+
+            // Recherche en temps réel
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('.table tbody tr');
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
             });
         });
 

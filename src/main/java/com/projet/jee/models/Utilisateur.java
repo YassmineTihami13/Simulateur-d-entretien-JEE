@@ -1,5 +1,7 @@
 package com.projet.jee.models;
 
+import java.time.LocalDateTime;
+
 public class Utilisateur {
     private long id;
     private String nom;
@@ -7,6 +9,7 @@ public class Utilisateur {
     private String email;
     private String motDePasse;
     private Role role;
+    private LocalDateTime dateCreation;
     private boolean statut;        // Actif/Inactif (1/0)
     private boolean estVerifie;    // Vérifié/Non vérifié (1/0)
 
@@ -14,17 +17,27 @@ public class Utilisateur {
         ADMIN, FORMATEUR, CANDIDAT
     }
 
-    public Utilisateur() {}
+    // Constructeur par défaut
+    public Utilisateur() {
+        this.dateCreation = LocalDateTime.now();
+    }
 
-    public Utilisateur(long id, String nom, String prenom, String email, String motDePasse, Role role) {
+    // Constructeur complet
+    public Utilisateur(long id, String nom, String prenom, String email, String motDePasse, Role role, LocalDateTime dateCreation) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
         this.motDePasse = motDePasse;
         this.role = role;
+        this.dateCreation = dateCreation != null ? dateCreation : LocalDateTime.now();
         this.statut = true;        // Actif par défaut
         this.estVerifie = false;   // Non vérifié par défaut
+    }
+
+    // Constructeur sans date (utilise la date actuelle)
+    public Utilisateur(long id, String nom, String prenom, String email, String motDePasse, Role role) {
+        this(id, nom, prenom, email, motDePasse, role, LocalDateTime.now());
     }
 
     // Getters et Setters
@@ -46,6 +59,9 @@ public class Utilisateur {
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
+    public LocalDateTime getDateCreation() { return dateCreation; }
+    public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
+
     public boolean getStatut() { return statut; }
     public void setStatut(boolean statut) { this.statut = statut; }
 
@@ -54,8 +70,7 @@ public class Utilisateur {
 
     @Override
     public String toString() {
-        return "Utilisateur [id=" + id + ", nom=" + nom + ", prenom=" + prenom +
-                ", email=" + email + ", role=" + role + ", statut=" + statut +
-                ", estVerifie=" + estVerifie + "]";
+        return "Utilisateur [id=" + id + ", nom=" + nom + ", prenom=" + prenom + ", email=" + email + ", role=" + role + ", dateCreation=" + dateCreation + ",statut=" + statut +
+                ", estVerifie=" + estVerifie +"]";
     }
 }

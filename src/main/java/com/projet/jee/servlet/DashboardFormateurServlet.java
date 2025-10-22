@@ -16,7 +16,8 @@ public class DashboardFormateurServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        
+
+        // Vérifier si la session existe
         if (session == null || session.getAttribute("formateur") == null) {
             response.sendRedirect(request.getContextPath() + "/jsp/login.jsp");
             return;
@@ -27,17 +28,17 @@ public class DashboardFormateurServlet extends HttpServlet {
 
         // Récupérer la spécialité du formateur (ENUM: "INFORMATIQUE", "MECATRONIQUE", etc.)
         String specialiteFormateur = formateur.getSpecialite().name();
-        
+
         System.out.println("=== DEBUG DASHBOARD ===");
         System.out.println("Formateur: " + formateur.getNom() + " " + formateur.getPrenom());
         System.out.println("Spécialité (ENUM): " + specialiteFormateur);
-        
+
         // Compter les candidats du même domaine
-     // Récupérer le nombre de candidats dans le domaine du formateur
+        // Récupérer le nombre de candidats dans le domaine du formateur
         int nbCandidats = dao.getNombreCandidatsParDomaine(formateur.getSpecialite().name());
 
         request.setAttribute("nbCandidats", nbCandidats);
-        
+
         // Récupérer les autres statistiques
         int nbReservations = dao.getTotalReservations(formateur.getId());
         int nbEntretiensPasses = dao.getEntretiensPasses(formateur.getId());

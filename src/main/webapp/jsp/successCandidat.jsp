@@ -23,7 +23,7 @@
             </ul>
         </div>
 
-        <a href="${pageContext.request.contextPath}/index.jsp" class="btn">Retour à l'accueil</a>
+        <a href="index.jsp" class="btn">Retour à l'accueil</a>
     </div>
 </body>
 </html>

@@ -33,82 +33,8 @@
     </nav>
 
     <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <span>LearnPro</span>
-            </div>
-        </div>
-
-        <div class="nav-section">
-            <h3 class="nav-title">Principal</h3>
-            <ul class="nav-links">
-                <li>
-                    <a href="#" class="nav-link active">
-                        <i class="fas fa-chart-pie"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        <span>Utilisateurs</span>
-                    </a>
-                </li>
-                <li>
-    <a href="${pageContext.request.contextPath}/admin/formateurs" class="nav-link">
-        <i class="fas fa-chalkboard-teacher"></i>
-        <span>Formateurs</span>
-    </a>
-</li>
-                <li>
-    <a href="${pageContext.request.contextPath}/admin/candidats" class="nav-link">
-                        <i class="fas fa-user-graduate"></i>
-                        <span>Candidats</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="nav-section">
-            <h3 class="nav-title">Gestion</h3>
-            <ul class="nav-links">
-                <li>
-                    <a href="${pageContext.request.contextPath}/createAdminInit" class="nav-link">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Créer Admin</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-cog"></i>
-                        <span>Paramètres</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Rapports</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="nav-section" style="margin-top: auto;">
-            <ul class="nav-links">
-                
-                <li >
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Déconnexion</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </aside>
+    <!-- Sidebar -->
+<%@ include file="sidebar.jsp" %>
 
     <!-- Main Content -->
     <main class="main-content">

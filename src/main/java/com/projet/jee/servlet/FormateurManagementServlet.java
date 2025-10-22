@@ -1,4 +1,3 @@
-// FormateurManagementServlet.java
 package com.projet.jee.servlet;
 
 import com.projet.jee.dao.FormateurDAO;
@@ -35,4 +34,8 @@ public class FormateurManagementServlet extends HttpServlet {
             request.getRequestDispatcher("/jsp/adminFormateurs.jsp").forward(request, response);
         }
     }
+
+
+
+
 }

@@ -1,3 +1,4 @@
+
 package com.projet.jee.dao;
 
 import java.sql.Connection;
@@ -17,18 +18,18 @@ public class DashboardFormateurDAO {
     public int getNombreCandidatsParDomaine(String specialiteFormateur) {
         // Convertir l'ENUM du formateur vers le format texte du candidat
         String domaineCandidat = convertirSpecialiteVersDomaine(specialiteFormateur);
-        
+
         String query = "SELECT COUNT(*) FROM candidat c " +
-                       "INNER JOIN utilisateur u ON c.id = u.id " +
-                       "WHERE UPPER(TRIM(c.domaineProfessionnel)) = UPPER(?) " +
-                       "AND u.role = 'CANDIDAT'";
-        
+                "INNER JOIN utilisateur u ON c.id = u.id " +
+                "WHERE UPPER(TRIM(c.domaineProfessionnel)) = UPPER(?) " +
+                "AND u.role = 'CANDIDAT'";
+
         try (Connection con = ConnectionBD.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            
+
             ps.setString(1, domaineCandidat);
             ResultSet rs = ps.executeQuery();
-            
+
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -44,7 +45,7 @@ public class DashboardFormateurDAO {
      */
     private String convertirSpecialiteVersDomaine(String specialite) {
         if (specialite == null) return "";
-        
+
         switch (specialite.toUpperCase()) {
             case "INFORMATIQUE":
                 return "Informatique";
@@ -80,7 +81,7 @@ public class DashboardFormateurDAO {
 
     public int getEntretiensPasses(long formateurId) {
         String query = "SELECT COUNT(*) FROM reservation " +
-                       "WHERE formateur_id = ? AND dateReservation < CURDATE()";
+                "WHERE formateur_id = ? AND dateReservation < CURDATE()";
         try (Connection con = ConnectionBD.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setLong(1, formateurId);
@@ -112,10 +113,10 @@ public class DashboardFormateurDAO {
 
     public Formateur getFormateurById(long userId) {
         String query = "SELECT u.id, u.nom, u.prenom, u.email, u.motDePasse, f.specialite, " +
-                       "f.anneeExperience, f.certifications, f.tarifHoraire, f.description " +
-                       "FROM utilisateur u " +
-                       "JOIN formateur f ON u.id = f.id " +
-                       "WHERE u.id = ?";
+                "f.anneeExperience, f.certifications, f.tarifHoraire, f.description " +
+                "FROM utilisateur u " +
+                "JOIN formateur f ON u.id = f.id " +
+                "WHERE u.id = ?";
 
         try (Connection con = ConnectionBD.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
@@ -123,16 +124,16 @@ public class DashboardFormateurDAO {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new Formateur(
-                    rs.getLong("id"),
-                    rs.getString("nom"),
-                    rs.getString("prenom"),
-                    rs.getString("email"),
-                    rs.getString("motDePasse"),
-                    rs.getString("specialite"),
-                    rs.getInt("anneeExperience"),
-                    rs.getString("certifications"),
-                    rs.getDouble("tarifHoraire"),
-                    rs.getString("description")
+                        rs.getLong("id"),
+                        rs.getString("nom"),
+                        rs.getString("prenom"),
+                        rs.getString("email"),
+                        rs.getString("motDePasse"),
+                        rs.getString("specialite"),
+                        rs.getInt("anneeExperience"),
+                        rs.getString("certifications"),
+                        rs.getDouble("tarifHoraire"),
+                        rs.getString("description")
                 );
             }
         } catch (SQLException e) {

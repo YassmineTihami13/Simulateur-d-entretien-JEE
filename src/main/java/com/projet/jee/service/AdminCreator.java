@@ -1,6 +1,7 @@
 package com.projet.jee.service;
 
 import com.projet.jee.dao.ConnectionBD;
+import com.projet.jee.models.Administrateur;
 
 import java.security.MessageDigest;
 import java.sql.Connection;

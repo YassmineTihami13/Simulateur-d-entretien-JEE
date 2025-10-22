@@ -1,15 +1,17 @@
 package com.projet.jee.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QuestionChoixMultiple extends Question {
-    public QuestionChoixMultiple() {}
+	private List<Choix> choixList = new ArrayList<>();
 
-    public QuestionChoixMultiple(long id, String contenu, TypeQuestion type, Difficulte difficulte,
-                                 String domaine, java.time.LocalDate dateCreation, long createurId) {
-        super(id, contenu, type, difficulte, domaine, dateCreation, createurId);
-    }
+	public void addChoix(Choix c) {
+	    choixList.add(c);
+	}
 
-    @Override
-    public String toString() {
-        return "QuestionChoixMultiple " + super.toString();
-    }
+	public List<Choix> getChoixList() {
+	    return choixList;
+	}
+
 }

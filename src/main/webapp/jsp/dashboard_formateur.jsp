@@ -1,11 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.projet.jee.models.Formateur" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%
+    // Vérifier si l'utilisateur est connecté
     if (session == null || session.getAttribute("formateur") == null) {
         response.sendRedirect(request.getContextPath() + "/jsp/login.jsp");
         return;
     }
-    
+
     Formateur formateur = (Formateur) session.getAttribute("formateur");
     String nom = formateur.getNom();
     String prenom = formateur.getPrenom();
@@ -14,10 +18,11 @@
 <html>
 <head>
     <title>Dashboard Formateur</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboardformateur.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/dashboardformateur.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
     <!-- 🟣 SIDEBAR DU FORMATEUR -->
@@ -43,24 +48,30 @@
                         <span>Tableau de bord</span>
                     </a>
                 </li>
-               <li>
-                   <a href="<%= request.getContextPath() %>/disponibilites" class="nav-link">
-                       <i class="fas fa-calendar-alt"></i>
-                       <span>Mes disponibilités</span>
-                   </a>
-               </li>
                 <li>
                     <a href="#" class="nav-link">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Mes candidats</span>
+                    </a>
+                </li>
+                 <li>
+                                   <a href="<%= request.getContextPath() %>/disponibilites" class="nav-link">
+                                       <i class="fas fa-calendar-alt"></i>
+                                       <span>Mes disponibilités</span>
+                                   </a>
+                               </li>
+                <li>
+                    <a href="<%= request.getContextPath() %>/reservations" class="nav-link">
                         <i class="fas fa-calendar-check"></i>
                         <span>Mes entretiens</span>
                     </a>
                 </li>
-                <li>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-book"></i>
-                        <span>Mes modules</span>
-                    </a>
-                </li>
+               <li>
+                   <a href="<%= request.getContextPath() %>/ManageQuestions" class="nav-link">
+                       <i class="fas fa-book"></i>
+                       <span>Gérer mes questions</span>
+                   </a>
+               </li>
             </ul>
         </div>
 
