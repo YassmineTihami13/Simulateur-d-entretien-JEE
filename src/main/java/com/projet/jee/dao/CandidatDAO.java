@@ -2,7 +2,6 @@ package com.projet.jee.dao;
 
 import com.projet.jee.models.Candidat;
 import com.projet.jee.models.Utilisateur;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
@@ -33,14 +32,9 @@ public class CandidatDAO {
                 candidat.setRole(Utilisateur.Role.valueOf(rs.getString("role")));
                 candidat.setStatut(rs.getBoolean("statut"));
                 candidat.setEstVerifie(rs.getBoolean("estVerifie"));
-
-                // Conversion String → Enum
-                String domaineStr = rs.getString("domaineProfessionnel");
-                if (domaineStr != null) {
-                    candidat.setDomaineProfessionnel(domaineStr);
-                }
-
+                candidat.setDomaineProfessionnel(rs.getString("domaineProfessionnel"));
                 candidat.setCv(rs.getString("cv"));
+
                 candidats.add(candidat);
             }
         }
@@ -68,13 +62,9 @@ public class CandidatDAO {
                     candidat.setRole(Utilisateur.Role.valueOf(rs.getString("role")));
                     candidat.setStatut(rs.getBoolean("statut"));
                     candidat.setEstVerifie(rs.getBoolean("estVerifie"));
-
-                    String domaineStr = rs.getString("domaineProfessionnel");
-                    if (domaineStr != null) {
-                        candidat.setDomaineProfessionnel(domaineStr);
-                    }
-
+                    candidat.setDomaineProfessionnel(rs.getString("domaineProfessionnel"));
                     candidat.setCv(rs.getString("cv"));
+
                     return candidat;
                 }
             }
@@ -84,15 +74,20 @@ public class CandidatDAO {
 
     public boolean toggleCandidatStatus(long candidatId, boolean newStatus) throws SQLException {
         String sql = "UPDATE utilisateur SET statut = ? WHERE id = ? AND role = 'CANDIDAT'";
+
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setBoolean(1, newStatus);
             stmt.setLong(2, candidatId);
+
             return stmt.executeUpdate() > 0;
         }
     }
 
+    /**
+     * Met à jour les informations d'un candidat
+     */
     public boolean updateCandidat(Candidat candidat, boolean updatePassword) throws SQLException {
         Connection conn = null;
         PreparedStatement stmtUser = null;
@@ -102,15 +97,21 @@ public class CandidatDAO {
             conn = ConnectionBD.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Table utilisateur
-            String sqlUser = updatePassword
-                    ? "UPDATE utilisateur SET nom=?, prenom=?, email=?, motDePasse=? WHERE id=? AND role='CANDIDAT'"
-                    : "UPDATE utilisateur SET nom=?, prenom=?, email=? WHERE id=? AND role='CANDIDAT'";
+            // 1. Mettre à jour la table utilisateur
+            String sqlUser;
+            if (updatePassword) {
+                sqlUser = "UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, motDePasse = ? " +
+                        "WHERE id = ? AND role = 'CANDIDAT'";
+            } else {
+                sqlUser = "UPDATE utilisateur SET nom = ?, prenom = ?, email = ? " +
+                        "WHERE id = ? AND role = 'CANDIDAT'";
+            }
 
             stmtUser = conn.prepareStatement(sqlUser);
             stmtUser.setString(1, candidat.getNom());
             stmtUser.setString(2, candidat.getPrenom());
             stmtUser.setString(3, candidat.getEmail().toLowerCase());
+
             if (updatePassword) {
                 stmtUser.setString(4, hashPassword(candidat.getMotDePasse()));
                 stmtUser.setLong(5, candidat.getId());
@@ -124,20 +125,27 @@ public class CandidatDAO {
                 return false;
             }
 
-            // 2. Table candidat
-            stmtCandidat = conn.prepareStatement(
-                    "UPDATE candidat SET domaineProfessionnel=?, cv=? WHERE id=?"
-            );
-            stmtCandidat.setString(1, candidat.getDomaineProfessionnelEnumName());
+            // 2. Mettre à jour la table candidat
+            String sqlCandidat = "UPDATE candidat SET domaineProfessionnel = ?, cv = ? WHERE id = ?";
+
+            stmtCandidat = conn.prepareStatement(sqlCandidat);
+            stmtCandidat.setString(1, candidat.getDomaineProfessionnel());
             stmtCandidat.setString(2, candidat.getCv());
             stmtCandidat.setLong(3, candidat.getId());
+
             stmtCandidat.executeUpdate();
 
             conn.commit();
             return true;
 
         } catch (SQLException e) {
-            if (conn != null) conn.rollback();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             throw e;
         } finally {
             if (stmtUser != null) stmtUser.close();
@@ -149,12 +157,18 @@ public class CandidatDAO {
         }
     }
 
+    /**
+     * Hash le mot de passe avec SHA-256
+     */
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(password.getBytes());
+
             StringBuilder sb = new StringBuilder();
-            for (byte b : hashedBytes) sb.append(String.format("%02x", b));
+            for (byte b : hashedBytes) {
+                sb.append(String.format("%02x", b));
+            }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Erreur lors du hashage du mot de passe", e);

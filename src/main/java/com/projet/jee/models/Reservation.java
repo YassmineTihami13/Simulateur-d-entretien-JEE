@@ -19,7 +19,8 @@ public class Reservation {
             return displayName;
         }
     }
-
+    private String candidatNom;
+    private String formateurNom;
     private long id;
     private LocalDate dateReservation;
     private double duree;
@@ -74,6 +75,11 @@ public class Reservation {
         return statut != null ? statut.getDisplayName() : "Inconnu";
     }
 
+    public String getCandidatNom() { return candidatNom; }
+    public void setCandidatNom(String candidatNom) { this.candidatNom = candidatNom; }
+
+    public String getFormateurNom() { return formateurNom; }
+    public void setFormateurNom(String formateurNom) { this.formateurNom = formateurNom; }
     @Override
     public String toString() {
         return "Reservation [id=" + id + ", date=" + dateReservation +

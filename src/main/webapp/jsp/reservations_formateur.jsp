@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.projet.jee.model.Formateur" %>
-<%@ page import="com.projet.jee.model.ReservationDetails" %>
+<%@ page import="com.projet.jee.models.Formateur" %>
+<%@ page import="com.projet.jee.models.ReservationDetails" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%
