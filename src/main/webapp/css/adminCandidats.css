@@ -2,7 +2,7 @@
 
 /* Override du layout pour enlever la rightbar */
 body {
-    grid-template-columns: 280px 1fr !important;
+    grid-template-columns: 250px 1fr !important;
     grid-template-areas:
         "sidebar navbar"
         "sidebar main" !important;
@@ -106,7 +106,7 @@ body {
 
 .table-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .search-box {
@@ -131,38 +131,220 @@ body {
     color: var(--gray-700);
 }
 
-/* Table */
+/* Table Container - Largeur réduite */
+.table-container {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    max-width: 1200px; /* Largeur maximale réduite */
+    margin: 0 auto; /* Centrer le tableau */
+}
+
+/* Réduire la largeur des colonnes spécifiques */
 .table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* Forcer la disposition fixe */
 }
 
-.table thead {
-    background: var(--gray-50);
+/* Ajuster les largeurs des colonnes */
+.table th:nth-child(1), /* Colonne Candidat */
+.table td:nth-child(1) {
+    width: 25%; /* Réduit la largeur */
+    min-width: 200px;
 }
 
-.table th {
-    padding: 16px 24px;
-    text-align: left;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--gray-700);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.table th:nth-child(2), /* Colonne Domaine */
+.table td:nth-child(2) {
+    width: 15%;
+    min-width: 120px;
 }
 
-.table tbody tr {
-    border-bottom: 1px solid var(--gray-200);
-    transition: background 0.2s;
+.table th:nth-child(3), /* Colonne CV */
+.table td:nth-child(3) {
+    width: 12%;
+    min-width: 100px;
 }
 
-.table tbody tr:hover {
-    background: var(--gray-50);
+.table th:nth-child(4), /* Colonne Vérifié */
+.table td:nth-child(4) {
+    width: 12%;
+    min-width: 100px;
 }
 
+.table th:nth-child(5), /* Colonne Statut */
+.table td:nth-child(5) {
+    width: 12%;
+    min-width: 100px;
+}
+
+.table th:nth-child(6), /* Colonne Actions */
+.table td:nth-child(6) {
+    width: 15%;
+    min-width: 120px;
+}
+
+/* Réduire le padding pour gagner de l'espace */
+.table th,
 .table td {
-    padding: 16px 24px;
-    color: var(--gray-700);
+    padding: 12px 16px; /* Padding réduit */
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Adapter les éléments internes */
+.table .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0; /* Permet le truncate */
+}
+
+.table .user-avatar {
+    width: 36px; /* Avatar plus petit */
+    height: 36px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.table .user-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.table .user-details h4 {
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table .user-details p {
+    font-size: 0.75rem;
+    margin: 2px 0 0 0;
+    color: var(--gray-500);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Réduire les badges */
+.domain-badge,
+.status-badge,
+.cv-status {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Réduire les boutons d'action */
+.action-buttons-table {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-action {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+    padding: 0;
+}
+
+/* Réduire l'en-tête du tableau */
+.table-header {
+    padding: 20px;
+}
+
+/* Version encore plus compacte */
+@media (max-width: 1400px) {
+    .table-container {
+        max-width: 1000px;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px 12px;
+    }
+
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+        width: 22%;
+    }
+}
+
+/* Pour les écrans moyens */
+@media (max-width: 1200px) {
+    .table-container {
+        max-width: 900px;
+    }
+
+    .table th,
+    .table td {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .table .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .table .user-details h4 {
+        font-size: 0.85rem;
+    }
+}
+
+/* Pour les petits écrans - masquer certaines colonnes */
+@media (max-width: 768px) {
+    .table-container {
+        max-width: 100%;
+        overflow-x: auto; /* Permettre le scroll horizontal */
+    }
+
+    .table {
+        min-width: 700px; /* Largeur minimale pour garder la lisibilité */
+    }
+
+    /* Masquer certaines colonnes sur mobile */
+    .table th:nth-child(4), /* Vérifié */
+    .table td:nth-child(4),
+    .table th:nth-child(5), /* Statut */
+    .table td:nth-child(5) {
+        display: none;
+    }
+
+    /* Réajuster les largeurs */
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+        width: 30%;
+    }
+
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        width: 20%;
+    }
+
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        width: 20%;
+    }
+
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        width: 20%;
+    }
 }
 
 .user-info {
@@ -818,5 +1000,257 @@ body {
 
     .form-row {
         grid-template-columns: 1fr;
+    }
+}
+/* Styles améliorés pour la section CV */
+.cv-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.cv-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.cv-item i.fa-file-pdf {
+    font-size: 3rem;
+    color: #e74c3c;
+    flex-shrink: 0;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cv-info {
+    flex: 1;
+}
+
+.cv-name {
+    font-weight: 700;
+    color: var(--gray-900);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.cv-description {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+
+.cv-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.btn-cv-action {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cv-view {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: 2px solid #3b82f6;
+}
+
+.btn-cv-view:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-cv-download {
+    background: white;
+    color: #6366f1;
+    border: 2px solid #6366f1;
+}
+
+.btn-cv-download:hover {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.no-cv {
+    text-align: center;
+    padding: 60px 40px;
+    color: var(--gray-500);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+}
+
+.no-cv i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #94a3b8;
+    opacity: 0.7;
+}
+
+.no-cv h4 {
+    margin: 0 0 16px 0;
+    color: var(--gray-600);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.no-cv p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Section de prévisualisation améliorée */
+.cv-preview-section {
+    margin-top: 24px;
+}
+
+.cv-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #1e293b;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.cv-preview-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.cv-preview-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-preview-action {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.btn-preview-action:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.cv-preview-container {
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.cv-preview-frame {
+    width: 100%;
+    height: 600px;
+    border: none;
+    background: white;
+}
+
+.cv-preview-note {
+    text-align: center;
+    padding: 12px;
+    background: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+/* Indicateur de chargement */
+.cv-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #64748b;
+}
+
+.cv-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cv-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .cv-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-cv-action {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .cv-preview-frame {
+        height: 400px;
+    }
+
+    .cv-preview-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .cv-preview-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 }

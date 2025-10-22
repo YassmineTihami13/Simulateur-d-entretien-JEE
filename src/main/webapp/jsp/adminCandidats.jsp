@@ -408,78 +408,91 @@
         </div>
     </div>
 
-   <!-- Modal d'ajout/modification de candidat -->
-       <div id="addCandidatModal" class="modal-overlay">
-           <div class="modal-content">
-               <div class="modal-header">
-                   <h3 class="modal-title" id="modalTitle">Ajouter un Candidat</h3>
-                   <button class="modal-close" onclick="closeAddCandidatModal()">&times;</button>
-               </div>
-               <div class="modal-body">
-                   <form id="addCandidatForm" enctype="multipart/form-data">
-                       <!-- Champ caché pour l'ID (pour la modification) -->
-                       <input type="hidden" id="candidatIdField" name="id" value="">
+    <!-- Modal d'ajout/modification de candidat -->
+    <div id="addCandidatModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajouter un Candidat</h3>
+                <button class="modal-close" onclick="closeAddCandidatModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addCandidatForm" enctype="multipart/form-data">
+                    <!-- Champ caché pour l'ID (pour la modification) -->
+                    <input type="hidden" id="candidatIdField" name="id" value="">
+                    <input type="hidden" id="isEditMode" value="false">
 
-                       <div class="form-row">
-                           <div class="form-group">
-                               <label class="form-label required" for="nom">Nom</label>
-                               <input type="text" id="nom" name="nom" class="form-input" placeholder="Nom de famille" required>
-                               <span class="form-error" id="nomError">Ce champ est requis</span>
-                           </div>
-                           <div class="form-group">
-                               <label class="form-label required" for="prenom">Prénom</label>
-                               <input type="text" id="prenom" name="prenom" class="form-input" placeholder="Prénom" required>
-                               <span class="form-error" id="prenomError">Ce champ est requis</span>
-                           </div>
-                       </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required" for="nom">Nom</label>
+                            <input type="text" id="nom" name="nom" class="form-input" placeholder="Nom de famille" required>
+                            <span class="form-error" id="nomError">Ce champ est requis</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required" for="prenom">Prénom</label>
+                            <input type="text" id="prenom" name="prenom" class="form-input" placeholder="Prénom" required>
+                            <span class="form-error" id="prenomError">Ce champ est requis</span>
+                        </div>
+                    </div>
 
-                       <div class="form-group">
-                           <label class="form-label required" for="email">Email</label>
-                           <input type="email" id="email" name="email" class="form-input" placeholder="email@exemple.com" required>
-                           <span class="form-error" id="emailError">Veuillez entrer un email valide</span>
-                       </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="email@exemple.com" required>
+                        <span class="form-error" id="emailError">Veuillez entrer un email valide</span>
+                    </div>
 
-                       <div class="form-row">
-                           <div class="form-group">
-                               <label class="form-label required" for="motDePasse">Mot de passe</label>
-                               <input type="password" id="motDePasse" name="motDePasse" class="form-input" placeholder="••••••••" required>
-                               <span class="form-help">Minimum 6 caractères</span>
-                               <span class="form-error" id="motDePasseError">Minimum 6 caractères requis</span>
-                           </div>
-                           <div class="form-group">
-                               <label class="form-label required" for="confirmMotDePasse">Confirmer</label>
-                               <input type="password" id="confirmMotDePasse" name="confirmMotDePasse" class="form-input" placeholder="••••••••" required>
-                               <span class="form-error" id="confirmMotDePasseError">Les mots de passe ne correspondent pas</span>
-                           </div>
-                       </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="motDePasse" id="motDePasseLabel">Mot de passe</label>
+                            <input type="password" id="motDePasse" name="motDePasse" class="form-input" placeholder="••••••••">
+                            <span class="form-help" id="motDePasseHelp">Minimum 6 caractères</span>
+                            <span class="form-error" id="motDePasseError">Minimum 6 caractères requis</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmMotDePasse" id="confirmMotDePasseLabel">Confirmer</label>
+                            <input type="password" id="confirmMotDePasse" name="confirmMotDePasse" class="form-input" placeholder="••••••••">
+                            <span class="form-error" id="confirmMotDePasseError">Les mots de passe ne correspondent pas</span>
+                        </div>
+                    </div>
 
-                       <div class="form-group">
-                           <label class="form-label" for="domaineProfessionnel">Domaine Professionnel</label>
-                           <input type="text" id="domaineProfessionnel" name="domaineProfessionnel" class="form-input" placeholder="Ex: Informatique, Marketing, etc.">
-                           <span class="form-help">Optionnel</span>
-                       </div>
+                    <div class="form-group">
+                        <label class="form-label" for="domaineProfessionnel">Domaine Professionnel</label>
+                        <select id="domaineProfessionnel" name="domaineProfessionnel" class="form-select">
+                            <option value="">-- Sélectionnez un domaine --</option>
+                            <option value="INFORMATIQUE">Informatique</option>
+                            <option value="MECATRONIQUE">Mécatronique</option>
+                            <option value="INTELLIGENCE_ARTIFICIELLE">Intelligence Artificielle</option>
+                            <option value="CYBERSECURITE">Cybersécurité</option>
+                            <option value="GSTR">GSTR</option>
+                            <option value="SUPPLY_CHAIN_MANAGEMENT">Supply Chain Management</option>
+                            <option value="GENIE_CIVIL">Génie Civil</option>
+                        </select>
+                        <span class="form-help">Optionnel</span>
+                    </div>
 
-                       <div class="form-group">
-                           <label class="form-label" for="cv">CV (PDF)</label>
-                           <div class="file-upload-wrapper">
-                               <input type="file" id="cv" name="cv" class="form-file" accept=".pdf" onchange="updateFileName(this)">
-                               <label for="cv" class="file-upload-label">
-                                   <i class="fas fa-upload"></i>
-                                   Choisir un fichier
-                               </label>
-                               <span class="file-name" id="fileName">Aucun fichier sélectionné</span>
-                           </div>
-                           <span class="form-help">Fichier PDF uniquement (optionnel)</span>
-                       </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cv">CV (PDF)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="cv" name="cv" class="form-file" accept=".pdf" onchange="updateFileName(this)">
+                            <label for="cv" class="file-upload-label">
+                                <i class="fas fa-upload"></i>
+                                Choisir un fichier
+                            </label>
+                            <span class="file-name" id="fileName">Aucun fichier sélectionné</span>
+                        </div>
+                        <span class="form-help">Fichier PDF uniquement (optionnel)</span>
+                        <span class="form-help" id="currentCvInfo" style="display: none; color: var(--accent-indigo); font-weight: 600;">
+                            <i class="fas fa-file-pdf"></i> CV actuel: <span id="currentCvName"></span>
+                        </span>
+                    </div>
 
-                       <button type="submit" class="btn-submit" id="submitBtn">
-                           <i class="fas fa-user-plus"></i>
-                           Ajouter le Candidat
-                       </button>
-                   </form>
-               </div>
-           </div>
-       </div>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fas fa-user-plus"></i>
+                        <span id="submitBtnText">Ajouter le Candidat</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="${pageContext.request.contextPath}/js/adminCandidats.js"></script>
 </body>
