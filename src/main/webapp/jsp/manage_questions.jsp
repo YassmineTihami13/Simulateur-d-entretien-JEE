@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+ <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.projet.jee.models.Formateur" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -19,7 +19,7 @@
     <title>Gérer mes questions</title>
     <link rel="stylesheet" href="../css/dashboardformateur.css">
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/manage_questions.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/manage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -207,7 +207,6 @@
             </div>
         </div>
 
-        <!-- LISTE DES QUESTIONS EXISTANTES -->
  <!-- LISTE DES QUESTIONS EXISTANTES -->
 <div class="questions-list">
     <h2>Mes questions existantes</h2>
@@ -223,9 +222,9 @@
             <c:when test="${not empty questions}">
                 <div class="questions-grid" id="questionsGrid">
                     <c:forEach items="${questions}" var="question">
-                        <div class="question-card ${question.typeQuestion.name().toLowerCase().replace('_', '-')}" 
-                             data-type="${question.typeQuestion}">
-                            
+      <div class="question-card ${question.typeQuestion.name().toLowerCase().replace('_', '-')}" 
+                            data-type="${question.typeQuestion.name()}">
+
                             <div class="question-header">
                                 <span class="question-type ${question.typeQuestion.name().toLowerCase().replace('_', '-')}">
                                     <c:choose>
@@ -243,10 +242,7 @@
                                 ${question.contenu}
                             </div>
 
-                            <div class="question-details">
-                                <span class="question-domain">${question.domaine}</span>
-                              
-                            </div>
+
 
                             <!-- Réponses spécifiques -->
                             <c:if test="${question.typeQuestion == 'VRAI_FAUX'}">
@@ -313,11 +309,7 @@
                               placeholder="Saisissez la réponse modèle attendue..." required></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label for="domaine" class="form-label">Domaine *</label>
-                    <input type="text" id="domaine" name="domaine" class="form-control" 
-                           placeholder="Ex: Java, Web, Base de données..." required>
-                </div>
+                
 
                 <div class="form-group">
                     <label for="difficulte" class="form-label">Difficulté *</label>
@@ -366,11 +358,7 @@
                               placeholder="Ajoutez une explication si nécessaire..."></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label for="domaine" class="form-label">Domaine *</label>
-                    <input type="text" id="domaine" name="domaine" class="form-control"
-                           placeholder="Ex: Java, Web, Base de données..." required>
-                </div>
+               
 
                 <div class="form-group">
                     <label for="difficulte" class="form-label">Difficulté *</label>
@@ -390,6 +378,8 @@
         </div>
     </div>
 </div>
+<!-- Modal pour Question choix multiple  -->
+
 <div id="modalChoixMultiple" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -402,10 +392,7 @@
                     <label>Question *</label>
                     <textarea name="contenu" required></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Domaine *</label>
-                    <input type="text" name="domaine" required>
-                </div>
+                
                 <div class="form-group">
                     <label>Difficulté *</label>
                     <select name="difficulte" required>
@@ -416,10 +403,15 @@
                     </select>
                 </div>
                 <div id="choixContainer">
-                    <h4>Choix</h4>
+                    <h4>Choix (une seule réponse correcte)</h4>
                     <div class="choixItem">
-                        <input type="text" name="choix1" placeholder="Texte du choix" required>
-                        <label><input type="checkbox" name="correct1"> Correct</label>
+                        <input type="text" name="choixTexte[]" placeholder="Texte du choix" required>
+                        <label>
+                            <input type="radio" name="estCorrect" value="true" required> Correct
+                        </label>
+                        <button type="button" class="remove-choix" onclick="removeChoix(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
                 <button type="button" id="addChoixBtn">Ajouter un choix</button>
@@ -581,7 +573,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCancel = modal.querySelector('.btn-cancel');
     const addChoixBtn = document.getElementById('addChoixBtn');
     const choixContainer = document.getElementById('choixContainer');
-    let nbChoix = 1;
+
+    console.log('Modal Choix Multiple initialisé - Nouvelle approche');
 
     btnOpen.addEventListener('click', e => {
         e.preventDefault();
@@ -591,19 +584,20 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         modal.style.display = 'none';
         document.getElementById('formChoixMultiple').reset();
-        // Réinitialiser complètement les choix
+        // Réinitialiser les choix
         choixContainer.innerHTML = `
-            <h4>Choix</h4>
-            <div class="choixItem" data-index="1">
-                <input type="text" name="choix1" placeholder="Texte du choix" required>
-                <label><input type="checkbox" name="correct1"> Correct</label>
+            <h4>Choix (une seule réponse correcte)</h4>
+            <div class="choixItem">
+                <input type="text" name="choixTexte[]" placeholder="Texte du choix" required>
+                <label>
+                    <input type="radio" name="estCorrect" value="true" required> Correct
+                </label>
                 <button type="button" class="remove-choix" onclick="removeChoix(this)">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         `;
-        nbChoix = 1;
-        document.getElementById('nbChoix').value = nbChoix;
+        console.log('Modal fermé, choix réinitialisés');
     }
 
     spanClose.addEventListener('click', closeModal);
@@ -612,81 +606,103 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target === modal) closeModal(); 
     });
 
-    // Fonction pour supprimer un choix
+    // Fonction pour supprimer un choix - SIMPLIFIÉE
     window.removeChoix = function(button) {
-        if (nbChoix > 1) {
-            button.parentElement.remove();
-            updateChoixNumbers();
+        const choixItems = choixContainer.querySelectorAll('.choixItem');
+        if (choixItems.length > 1) {
+            const itemToRemove = button.parentElement;
+            const radioToRemove = itemToRemove.querySelector('input[type="radio"]');
+            const wasSelected = radioToRemove.checked;
+            
+            itemToRemove.remove();
+            
+            // Si le radio supprimé était sélectionné, sélectionner le premier choix restant
+            if (wasSelected) {
+                const firstRadio = choixContainer.querySelector('input[type="radio"]');
+                if (firstRadio) {
+                    firstRadio.checked = true;
+                }
+            }
         }
     };
 
-    // Fonction pour mettre à jour les numéros des choix
-    function updateChoixNumbers() {
-        const choixItems = choixContainer.querySelectorAll('.choixItem');
-        nbChoix = choixItems.length;
-        document.getElementById('nbChoix').value = nbChoix;
-        
-        // Renuméroter tous les choix
-        choixItems.forEach((item, index) => {
-            const newIndex = index + 1;
-            item.setAttribute('data-index', newIndex);
-            
-            const textInput = item.querySelector('input[type="text"]');
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            
-            // Sauvegarder les valeurs actuelles
-            const currentText = textInput.value;
-            const currentChecked = checkbox.checked;
-            
-            // Mettre à jour les noms
-            textInput.name = `choix${newIndex}`;
-            checkbox.name = `correct${newIndex}`;
-            
-            // Restaurer les valeurs
-            textInput.value = currentText;
-            checkbox.checked = currentChecked;
-        });
-    }
-
+    // Ajouter un nouveau choix - SIMPLIFIÉ
     addChoixBtn.addEventListener('click', () => {
-        nbChoix++;
+        const choixItems = choixContainer.querySelectorAll('.choixItem');
+        
         const div = document.createElement('div');
         div.className = 'choixItem';
-        div.setAttribute('data-index', nbChoix);
         div.innerHTML = `
-            <input type="text" name="choix${nbChoix}" placeholder="Texte du choix" required>
-            <label><input type="checkbox" name="correct${nbChoix}"> Correct</label>
+            <input type="text" name="choixTexte[]" placeholder="Texte du choix" required>
+            <label>
+                <input type="radio" name="estCorrect" value="true"> Correct
+            </label>
             <button type="button" class="remove-choix" onclick="removeChoix(this)">
                 <i class="fas fa-times"></i>
             </button>
         `;
+        
         choixContainer.appendChild(div);
-        document.getElementById('nbChoix').value = nbChoix;
+        console.log('Nouveau choix ajouté');
     });
 
     document.getElementById('formChoixMultiple').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Validation : au moins un choix doit être correct
-        const hasCorrectChoice = Array.from(choixContainer.querySelectorAll('input[type="checkbox"]'))
-            .some(checkbox => checkbox.checked);
-            
-        if (!hasCorrectChoice) {
-            alert('Au moins un choix doit être marqué comme correct !');
+        console.log('=== VÉRIFICATION AVANT ENVOI (Nouvelle approche) ===');
+        
+        // Récupérer tous les choix
+        const choixItems = choixContainer.querySelectorAll('.choixItem');
+        const choixTextes = Array.from(choixItems).map(item => 
+            item.querySelector('input[type="text"]').value
+        );
+        const correctRadio = document.querySelector('input[name="estCorrect"]:checked');
+        
+        console.log('Nombre de choix:', choixItems.length);
+        console.log('Textes des choix:', choixTextes);
+        console.log('Radio correct sélectionné:', !!correctRadio);
+        
+        // Validation : un choix doit être marqué comme correct
+        if (!correctRadio) {
+            alert('Veuillez sélectionner la réponse correcte !');
             return;
         }
 
         // Validation : tous les choix doivent avoir du texte
-        const emptyChoices = Array.from(choixContainer.querySelectorAll('input[type="text"]'))
-            .filter(input => !input.value.trim());
-            
+        const emptyChoices = choixTextes.filter(texte => !texte.trim());
         if (emptyChoices.length > 0) {
             alert('Tous les choix doivent contenir du texte !');
             return;
         }
 
-        const formData = new FormData(this);
-        console.log("FormData QCM avant envoi:", [...formData.entries()]);
+        // Compter le nombre de choix
+        const nbChoix = choixItems.length;
+        document.getElementById('nbChoix').value = nbChoix;
+
+        // Préparer les données pour l'envoi
+        const formData = new FormData();
+        
+        // Ajouter les champs de base
+        formData.append('contenu', this.contenu.value);
+        
+        formData.append('difficulte', this.difficulte.value);
+        formData.append('nbChoix', nbChoix.toString());
+
+        // Ajouter chaque choix avec son statut correct/incorrect
+        choixItems.forEach((item, index) => {
+            const texte = item.querySelector('input[type="text"]').value;
+            const estCorrect = item.querySelector('input[type="radio"]').checked;
+            
+            formData.append('choixTexte[]', texte);
+            formData.append('estCorrect[]', estCorrect.toString());
+            
+            console.log(`Choix ${index}: texte="${texte}", estCorrect=${estCorrect}`);
+        });
+
+        console.log("FormData final:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key + " = " + value);
+        }
         
         fetch(this.action, { 
             method: 'POST', 
@@ -714,36 +730,64 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
+//Filtrage des questions par type
+// Filtrage des questions par type - VERSION CORRIGÉE
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé - initialisation du filtrage');
+    
+    // Attendre un peu pour être sûr que le JSTL a rendu les éléments
+    setTimeout(initializeFiltering, 100);
+});
+
+function initializeFiltering() {
     const filterButtons = document.querySelectorAll('.btn-filter');
     const questionCards = document.querySelectorAll('.question-card');
+    
+    console.log('Boutons de filtre trouvés:', filterButtons.length);
+    console.log('Cartes de questions trouvées:', questionCards.length);
+    
+    // Debug: afficher toutes les cartes et leurs types
+    questionCards.forEach((card, index) => {
+        const cardType = card.getAttribute('data-type');
+        console.log(`Carte ${index + 1}:`, {
+            element: card,
+            type: cardType,
+            classes: card.className,
+            display: card.style.display
+        });
+    });
 
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Retirer la classe active de tous les boutons
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            // Ajouter la classe active au bouton cliqué
-            this.classList.add('active');
-
             const filterValue = this.getAttribute('data-filter');
+            console.log('Filtre activé:', filterValue);
             
+            // Mettre à jour les boutons actifs
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filtrer les cartes
             questionCards.forEach(card => {
+                const cardType = card.getAttribute('data-type');
+                
                 if (filterValue === 'all') {
                     card.style.display = 'block';
+                    console.log('Afficher toutes les cartes');
                 } else {
-                    const cardType = card.getAttribute('data-type');
                     if (cardType === filterValue) {
                         card.style.display = 'block';
+                        console.log(`Afficher carte type: ${cardType}`);
                     } else {
                         card.style.display = 'none';
+                        console.log(`Cacher carte type: ${cardType}`);
                     }
                 }
             });
         });
     });
-});
-
+    
+    console.log('Filtrage initialisé avec succès');
+}
 // Suppression d'une question
 function deleteQuestion(questionId) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette question ?')) {

@@ -48,19 +48,19 @@ public class AddQuestionReponseLibreServlet extends HttpServlet {
             // Récupérer les paramètres du formulaire
             String contenu = request.getParameter("contenu");
             String reponseAttendue = request.getParameter("reponseAttendue");
-            String domaine = request.getParameter("domaine");
+         
             String difficulteStr = request.getParameter("difficulte");
 
             System.out.println("Paramètres reçus :");
             System.out.println(" - contenu = " + contenu);
             System.out.println(" - reponseAttendue = " + reponseAttendue);
-            System.out.println(" - domaine = " + domaine);
+      
             System.out.println(" - difficulte = " + difficulteStr);
 
             // Validation des champs requis
             if (contenu == null || contenu.trim().isEmpty() ||
                 reponseAttendue == null || reponseAttendue.trim().isEmpty() ||
-                domaine == null || domaine.trim().isEmpty() ||
+           
                 difficulteStr == null || difficulteStr.trim().isEmpty()) {
                 
                 System.out.println("❌ Validation échouée : un ou plusieurs champs sont vides.");
@@ -73,7 +73,7 @@ public class AddQuestionReponseLibreServlet extends HttpServlet {
             QuestionReponse question = new QuestionReponse();
             question.setContenu(contenu.trim());
             question.setReponseAttendue(reponseAttendue.trim());
-            question.setDomaine(domaine.trim());
+        
             question.setDifficulte(Question.Difficulte.valueOf(difficulteStr));
             question.setTypeQuestion(Question.TypeQuestion.REPONSE);
             question.setDateCreation(LocalDate.now());
