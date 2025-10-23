@@ -124,6 +124,118 @@
         .btn-secondary { background-color: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
         .cv-link { color: #007bff; text-decoration: none; }
         .cv-link:hover { text-decoration: underline; }
+        
+        /* Styles pour la visualisation du CV */
+        .cv-view-btn {
+            background: #8B5FBF;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cv-view-btn:hover {
+            background: #7A4FA8;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .no-cv {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.875rem;
+        }
+        
+        .cv-filename {
+            font-size: 0.875rem;
+            color: #495057;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        /* Modal pour visualiser le CV */
+        .cv-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cv-modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cv-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .cv-modal-body {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .cv-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6B7280;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-close-modal:hover {
+            background: #F3F4F6;
+            color: #374151;
+        }
+        
+        .cv-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +285,39 @@
             <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <%= errorMessage %></div>
         <% } %>
 
+        <!-- Messages de succès/erreur -->
+        <% 
+            String success = request.getParameter("success");
+            String error = request.getParameter("error");
+        %>
+        <% if (success != null) { %>
+            <div class="alert alert-success" style="background: #D1FAE5; color: #065F46; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #A7F3D0;">
+                <i class="fas fa-check-circle"></i>
+                <% if ("accepted".equals(success)) { %>
+                    Réservation acceptée avec succès
+                <% } else if ("rejected".equals(success)) { %>
+                    Réservation refusée avec succès
+                <% } %>
+            </div>
+        <% } %>
+
+        <% if (error != null) { %>
+            <div class="alert alert-error" style="background: #FEE2E2; color: #991B1B; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #FECACA;">
+                <i class="fas fa-exclamation-circle"></i>
+                <% if ("missing_params".equals(error)) { %>
+                    Paramètres manquants
+                <% } else if ("invalid_id".equals(error)) { %>
+                    ID de réservation invalide
+                <% } else if ("accept_failed".equals(error)) { %>
+                    Échec de l'acceptation de la réservation
+                <% } else if ("reject_failed".equals(error)) { %>
+                    Échec du refus de la réservation
+                <% } else { %>
+                    Erreur lors du traitement
+                <% } %>
+            </div>
+        <% } %>
+
         <div class="disponibilites-container">
             <div class="table-container">
                 <table class="disponibilites-table">
@@ -192,21 +337,28 @@
                     <% if (reservations != null && !reservations.isEmpty()) {
                         for (ReservationDetails r : reservations) {
                             String statut = r.getStatut().name();
+                            String cvUrl = r.getCv() != null ? 
+                                request.getContextPath() + "/view-cv?file=" + java.net.URLEncoder.encode(r.getCv(), "UTF-8") : "";
                     %>
                         <tr>
                             <td><%= r.getDateReservation() != null ? r.getDateReservation().format(dateFormatter) : "-" %></td>
                             <td><strong><%= r.getNomCompletCandidat() %></strong></td>
                             <td><%= r.getCandidatEmail() %></td>
                             <td>
-                                <% if (r.getCv() != null && !r.getCv().isEmpty()) { %>
-                                    <a href="${pageContext.request.contextPath}/download?file=<%= r.getCv() %>"
-                                       class="cv-link"
-                                       title="Télécharger le CV">
-                                        <i class="fas fa-download"></i> <%= r.getCvFileName() %>
-                                    </a>
-                                <% } else { %>
-                                    <span class="text-muted">Aucun CV</span>
-                                <% } %>
+                                <div class="cv-actions">
+                                    <% if (r.getCv() != null && !r.getCv().isEmpty()) { %>
+                                        <span class="cv-filename" title="<%= r.getCvFileName() %>">
+                                            <%= r.getCvFileName() %>
+                                        </span>
+                                        <button onclick="viewCv('<%= cvUrl %>', '<%= r.getCvFileName() %>')" 
+                                                class="cv-view-btn"
+                                                title="Visualiser le CV">
+                                            <i class="fas fa-eye"></i> Voir le CV
+                                        </button>
+                                    <% } else { %>
+                                        <span class="no-cv">Aucun CV</span>
+                                    <% } %>
+                                </div>
                             </td>
                             <td><%= r.getDuree() %></td>
                             <td><%= r.getPrix() %> MAD</td>
@@ -259,6 +411,21 @@
         </div>
     </main>
 
+    <!-- Modal pour visualiser le CV -->
+    <div id="cvModal" class="cv-modal">
+        <div class="cv-modal-content">
+            <div class="cv-modal-header">
+                <h3 id="cvModalTitle" style="margin: 0; color: #1F2937;">Visualisation du CV</h3>
+                <button class="btn-close-modal" onclick="closeCvModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cv-modal-body">
+                <iframe id="cvIframe" class="cv-iframe" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de refus -->
     <div id="rejectModal" class="modal">
         <div class="modal-content">
@@ -283,6 +450,42 @@
     </div>
 
     <script>
+        // Fonctions pour le modal de CV
+        function viewCv(cvUrl, fileName) {
+            const modal = document.getElementById('cvModal');
+            const iframe = document.getElementById('cvIframe');
+            const title = document.getElementById('cvModalTitle');
+            
+            // Mettre à jour le titre avec le nom du fichier
+            title.textContent = 'CV - ' + fileName;
+            
+            // Charger le PDF dans l'iframe
+            iframe.src = cvUrl;
+            
+            // Afficher le modal
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Empêcher le défilement de la page
+        }
+        
+        function closeCvModal() {
+            const modal = document.getElementById('cvModal');
+            const iframe = document.getElementById('cvIframe');
+            
+            // Cacher le modal
+            modal.style.display = 'none';
+            document.body.style.overflow = ''; // Rétablir le défilement
+            
+            // Vider l'iframe pour libérer la mémoire
+            iframe.src = '';
+        }
+        
+        // Fermer le modal CV en cliquant en dehors
+        document.getElementById('cvModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCvModal();
+            }
+        });
+
         function openRejectModal(reservationId) {
             document.getElementById('rejectReservationId').value = reservationId;
             document.getElementById('reason').value = '';
@@ -297,7 +500,18 @@
         window.onclick = function(event) {
             var modal = document.getElementById('rejectModal');
             if (event.target === modal) closeRejectModal();
+            
+            var cvModal = document.getElementById('cvModal');
+            if (event.target === cvModal) closeCvModal();
         }
+
+        // Fermer les modals avec la touche Échap
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCvModal();
+                closeRejectModal();
+            }
+        });
     </script>
 </body>
 </html>

@@ -1,28 +1,76 @@
 package com.projet.jee.models;
 
 public class Candidat extends Utilisateur {
-    private String domaineProfessionnel;
-    private String cv;
 
-    // SUPPRIMÉ: statut et estVerifie car ils sont déjà dans Utilisateur
+    public enum DomaineProfessionnel {
+        INFORMATIQUE("Informatique"),
+        MECATRONIQUE("Mécatronique"),
+        INTELLIGENCE_ARTIFICIELLE("Intelligence Artificielle"),
+        CYBERSECURITE("Cybersécurité"),
+        GSTR("GSTR"),
+        SUPPLY_CHAIN_MANAGEMENT("Supply Chain Management"),
+        GENIE_CIVIL("Génie Civil");
+
+        private final String displayName;
+
+        DomaineProfessionnel(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public static DomaineProfessionnel fromString(String text) {
+            for (DomaineProfessionnel d : DomaineProfessionnel.values()) {
+                if (d.name().equalsIgnoreCase(text)) {
+                    return d;
+                }
+            }
+            throw new IllegalArgumentException("Aucun domaine trouvé pour : " + text);
+        }
+    }
+
+    private DomaineProfessionnel domaineProfessionnel;
+    private String cv;
 
     public Candidat() {
         super();
     }
 
     public Candidat(long id, String nom, String prenom, String email, String motDePasse,
-                    String domaineProfessionnel, String cv) {
+                    DomaineProfessionnel domaineProfessionnel, String cv) {
         super(id, nom, prenom, email, motDePasse, Role.CANDIDAT);
         this.domaineProfessionnel = domaineProfessionnel;
         this.cv = cv;
     }
 
-    public String getDomaineProfessionnel() {
+    public Candidat(long id, String nom, String prenom, String email, String motDePasse,
+                    String domaineProfessionnel, String cv) {
+        super(id, nom, prenom, email, motDePasse, Role.CANDIDAT);
+        this.domaineProfessionnel = DomaineProfessionnel.fromString(domaineProfessionnel);
+        this.cv = cv;
+    }
+
+
+    public DomaineProfessionnel getDomaineProfessionnel() {
         return domaineProfessionnel;
     }
 
-    public void setDomaineProfessionnel(String domaineProfessionnel) {
+    public void setDomaineProfessionnel(DomaineProfessionnel domaineProfessionnel) {
         this.domaineProfessionnel = domaineProfessionnel;
+    }
+
+    public void setDomaineProfessionnel(String domaineProfessionnel) {
+        this.domaineProfessionnel = DomaineProfessionnel.fromString(domaineProfessionnel);
+    }
+
+    public String getDomaineProfessionnelDisplayName() {
+        return domaineProfessionnel != null ? domaineProfessionnel.getDisplayName() : "";
+    }
+
+    public String getDomaineProfessionnelEnumName() {
+        return domaineProfessionnel != null ? domaineProfessionnel.name() : "";
     }
 
     public String getCv() {
@@ -33,7 +81,7 @@ public class Candidat extends Utilisateur {
         this.cv = cv;
     }
 
-    // Méthode pour obtenir le nom du fichier CV (sans le préfixe UUID)
+
     public String getCvFileName() {
         if (cv == null || cv.isEmpty()) {
             return null;
@@ -45,13 +93,24 @@ public class Candidat extends Utilisateur {
         return cv;
     }
 
-    // Méthode pour vérifier si un CV est disponible
     public boolean hasCv() {
         return cv != null && !cv.trim().isEmpty();
     }
 
+    public String getCvDownloadUrl() {
+        if (cv == null || cv.isEmpty()) {
+            return null;
+        }
+        try {
+            return "/view-cv?file=" + java.net.URLEncoder.encode(cv, "UTF-8");
+        } catch (Exception e) {
+            return "/view-cv?file=" + cv;
+        }
+    }
+    
     @Override
     public String toString() {
-        return super.toString() + " Candidat [domaineProfessionnel=" + domaineProfessionnel + "]";
+        return super.toString() + " Candidat [domaineProfessionnel=" + getDomaineProfessionnelDisplayName() +
+                ", cv=" + cv + "]";
     }
 }

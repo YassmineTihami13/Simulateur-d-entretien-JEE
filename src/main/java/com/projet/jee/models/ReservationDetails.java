@@ -84,6 +84,17 @@ public class ReservationDetails {
     public String getStatutDisplayName() {
         return statut != null ? statut.getDisplayName() : "Inconnu";
     }
+    
+    public String getCvDownloadUrl() {
+        if (cv == null || cv.isEmpty()) {
+            return null;
+        }
+        try {
+            return "/view-cv?file=" + java.net.URLEncoder.encode(cv, "UTF-8");
+        } catch (Exception e) {
+            return "/view-cv?file=" + cv;
+        }
+    }
 
     @Override
     public String toString() {

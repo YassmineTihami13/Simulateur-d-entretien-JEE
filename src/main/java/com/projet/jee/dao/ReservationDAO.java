@@ -15,7 +15,7 @@ public class ReservationDAO {
         if (dbValue == null) return null;
         switch (dbValue.toUpperCase()) {
             case "EN_ATTENTE": return Statut.EN_ATTENTE;
-            case "CONFIRMEE":  return Statut.ACCEPTEE;
+            case "ACCEPTEE":  return Statut.ACCEPTEE;
             case "REFUSEE":    return Statut.REFUSEE;
             default: return null;
         }
@@ -25,7 +25,7 @@ public class ReservationDAO {
         if (s == null) return null;
         switch (s) {
             case EN_ATTENTE: return "EN_ATTENTE";
-            case ACCEPTEE:   return "CONFIRMEE";
+            case ACCEPTEE:   return "ACCEPTEE";
             case REFUSEE:    return "REFUSEE";
             default: return s.name();
         }

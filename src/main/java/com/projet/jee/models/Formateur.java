@@ -1,6 +1,5 @@
 package com.projet.jee.models;
 
-
 import java.util.List;
 import java.util.ArrayList;
 
@@ -139,11 +138,6 @@ public class Formateur extends Utilisateur {
     
     
     
-    
-   
-
-   
-
     public List<Disponibilite> getDisponibilites() {
         return disponibilites;
     }
