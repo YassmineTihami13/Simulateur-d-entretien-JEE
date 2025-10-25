@@ -29,13 +29,13 @@ public class Reservation {
     private long formateurId;
     private Long disponibiliteId;
     private Statut statut;
-
+    private String sessionLink;
     public Reservation() {
         this.statut = Statut.EN_ATTENTE;
     }
 
     public Reservation(long id, LocalDate dateReservation, double duree, double prix,
-                       long candidatId, long formateurId, Long disponibiliteId, Statut statut) {
+                       long candidatId, long formateurId, Long disponibiliteId, Statut statut,String sessionLink) {
         this.id = id;
         this.dateReservation = dateReservation;
         this.duree = duree;
@@ -44,6 +44,7 @@ public class Reservation {
         this.formateurId = formateurId;
         this.disponibiliteId = disponibiliteId;
         this.statut = statut != null ? statut : Statut.EN_ATTENTE;
+        this.sessionLink = sessionLink;
     }
 
     // Getters & Setters
@@ -80,6 +81,10 @@ public class Reservation {
 
     public String getFormateurNom() { return formateurNom; }
     public void setFormateurNom(String formateurNom) { this.formateurNom = formateurNom; }
+    
+    public String getSessionLink() { return sessionLink; }
+    public void setSessionLink(String sessionLink) { this.sessionLink = sessionLink; }
+    
     @Override
     public String toString() {
         return "Reservation [id=" + id + ", date=" + dateReservation +

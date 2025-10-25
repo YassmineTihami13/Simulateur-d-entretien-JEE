@@ -48,32 +48,14 @@ public class ReservationActionServlet extends HttpServlet {
         try {
             boolean success = false;
 
-            if ("accept".equalsIgnoreCase(action)) {
-                success = dao.updateReservationStatus(reservationId, Statut.ACCEPTEE, null);
-                if (success) {
-                    String[] contact = dao.getCandidatContactByReservationId(reservationId);
-                    Reservation reservation = dao.getReservationById(reservationId);
-                    if (contact != null && reservation != null) {
-                        String email = contact[0];
-                        String candidatNom = contact[1];
-                        EmailUtil.sendReservationAcceptedEmail(
-                                email, candidatNom,
-                                formateur.getPrenom() + " " + formateur.getNom(),
-                                reservation
-                        );
-                    }
-                    response.sendRedirect(request.getContextPath() + "/reservations?success=accepted");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/reservations?error=accept_failed");
-                }
-
-            } else if ("reject".equalsIgnoreCase(action)) {
+            if ("reject".equalsIgnoreCase(action)) {
                 String reason = request.getParameter("reason");
                 if (reason == null || reason.trim().isEmpty()) {
                     reason = "Motif non précisé";
                 }
 
-                success = dao.updateReservationStatus(reservationId, Statut.REFUSEE, reason);
+                // Utilisez la méthode existante sans lien de session pour le refus
+                success = dao.updateReservationStatus(reservationId, Statut.REFUSEE, reason, null);
                 if (success) {
                     String[] contact = dao.getCandidatContactByReservationId(reservationId);
                     Reservation reservation = dao.getReservationById(reservationId);

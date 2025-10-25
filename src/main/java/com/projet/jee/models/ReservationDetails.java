@@ -11,6 +11,7 @@ public class ReservationDetails {
     private long formateurId;
     private Long disponibiliteId;
     private Reservation.Statut statut;
+    private String sessionLink;
 
     // Nouveaux champs pour les détails
     private String candidatNom;
@@ -59,6 +60,9 @@ public class ReservationDetails {
 
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
+    
+    public String getSessionLink() { return sessionLink; }
+    public void setSessionLink(String sessionLink) { this.sessionLink = sessionLink; }
 
     // Méthodes utilitaires
     public String getNomCompletCandidat() {

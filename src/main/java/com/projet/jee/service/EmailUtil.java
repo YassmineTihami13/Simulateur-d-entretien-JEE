@@ -18,7 +18,6 @@ public class EmailUtil {
         return String.valueOf(code);
     }
 
-
     public static boolean sendVerificationEmail(String toEmail, String userName, String verificationCode) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -52,7 +51,6 @@ public class EmailUtil {
             return false;
         }
     }
-
 
     private static String buildEmailTemplate(String userName, String code) {
         return "<!DOCTYPE html>" +
@@ -97,7 +95,6 @@ public class EmailUtil {
                 "</body>" +
                 "</html>";
     }
-
 
     public static boolean sendVerificationEmailCandidat(String toEmail, String userName, String verificationCode) {
         Properties props = new Properties();
@@ -177,9 +174,18 @@ public class EmailUtil {
                 "</html>";
     }
 
-    // Dans com.projet.jee.service.EmailUtil (déjà existant)
     public static boolean sendReservationAcceptedEmail(String toEmail, String candidatName, String formateurName, com.projet.jee.models.Reservation reservation) {
-        String subject = "Votre réservation a été acceptée";
+        String subject = "Votre réservation a été acceptée - Détails de la session";
+        
+        // Debug: afficher les informations de la réservation
+        System.out.println("=== DEBUG EMAIL ===");
+        System.out.println("Envoi email à: " + toEmail);
+        System.out.println("Candidat: " + candidatName);
+        System.out.println("Formateur: " + formateurName);
+        System.out.println("Lien de session: " + (reservation != null ? reservation.getSessionLink() : "NULL"));
+        System.out.println("Date: " + (reservation != null ? reservation.getDateReservation() : "NULL"));
+        System.out.println("===================");
+        
         String html = buildReservationAcceptedTemplate(candidatName, formateurName, reservation);
         return sendHtmlEmail(toEmail, subject, html);
     }
@@ -214,26 +220,75 @@ public class EmailUtil {
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
+            System.out.println("Email envoyé avec succès à: " + toEmail);
             return true;
         } catch (Exception e) {
+            System.err.println("Erreur lors de l'envoi de l'email: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    /* Templates simples (tu peux styliser comme tu veux) */
+    /* Template pour l'acceptation avec lien de session */
     private static String buildReservationAcceptedTemplate(String candidatName, String formateurName, com.projet.jee.models.Reservation r) {
         String date = r.getDateReservation() != null ? r.getDateReservation().toString() : "-";
-        return "<html><body>" +
-                "<h2>Bonjour " + candidatName + ",</h2>" +
-                "<p>Bonne nouvelle — votre réservation a été <strong>acceptée</strong> par " + formateurName + ".</p>" +
-                "<p><strong>Détails :</strong><br/>" +
-                "Date : " + date + "<br/>" +
-                "Durée : " + r.getDuree() + " heure(s)<br/>" +
-                "Prix : " + r.getPrix() + " MAD</p>" +
-                "<p>Nous vous souhaitons un excellent entretien.</p>" +
-                "<p>Cordialement,<br/>L'équipe InterviewPro</p>" +
-                "</body></html>";
+        String sessionLink = r.getSessionLink() != null ? r.getSessionLink() : "Lien non disponible";
+        
+        // Debug dans le template
+        System.out.println("Construction template avec lien: " + sessionLink);
+        
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 20px; }" +
+                ".container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }" +
+                ".header { background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%); padding: 40px 20px; text-align: center; }" +
+                ".header h1 { color: white; margin: 0; font-size: 28px; }" +
+                ".content { padding: 40px 30px; }" +
+                ".session-box { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-left: 4px solid #2196F3; padding: 25px; margin: 25px 0; border-radius: 12px; }" +
+                ".btn-primary { background: #2196F3; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 15px 0; font-weight: bold; font-size: 16px; text-align: center; border: none; cursor: pointer; }" +
+                ".btn-primary:hover { background: #1976D2; }" +
+                ".info { color: #666; line-height: 1.6; margin: 15px 0; }" +
+                ".session-link { background: #f8f9fa; padding: 12px; border-radius: 6px; margin: 10px 0; word-break: break-all; font-size: 14px; color: #2196F3; }" +
+                ".footer { background: #f8f9fa; padding: 20px; text-align: center; color: #999; font-size: 14px; }" +
+                ".action-section { text-align: center; margin: 20px 0; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h1>✅ Réservation Confirmée</h1>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p class='info'>Bonjour <strong>" + candidatName + "</strong>,</p>" +
+                "<p class='info'>Félicitations ! Votre réservation a été <strong>acceptée</strong> par " + formateurName + ".</p>" +
+                "<div class='session-box'>" +
+                "<h3 style='margin-top:0; color:#2196F3; text-align: center;'>📅 Détails de la session</h3>" +
+                "<p><strong>Date :</strong> " + date + "</p>" +
+                "<p><strong>Durée :</strong> " + r.getDuree() + " heure(s)</p>" +
+                "<p><strong>Prix :</strong> " + r.getPrix() + " MAD</p>" +
+                "<p><strong>Formateur :</strong> " + formateurName + "</p>" +
+                "<div style='margin: 20px 0;'>" +
+                "<p><strong>Lien de la session :</strong></p>" +
+                "<div class='session-link'>" + sessionLink + "</div>" +
+                "</div>" +
+                "</div>" +
+                "<div class='action-section'>" +
+                "<p style='margin-bottom: 15px;'><strong>Cliquez sur le bouton ci-dessous pour rejoindre la session :</strong></p>" +
+                "<a href='" + sessionLink + "' class='btn-primary' target='_blank' style='text-decoration: none;'>" +
+                "🚀 Rejoindre la session" +
+                "</a>" +
+                "</div>" +
+                "<p class='info'>💡 <strong>Conseil :</strong> Testez le lien avant la session et assurez-vous d'être ponctuel.</p>" +
+                "<p class='info'>Bonne préparation pour votre entretien !</p>" +
+                "</div>" +
+                "<div class='footer'>" +
+                "<p>© 2025 Simulateur d'Entretien - Tous droits réservés</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
     }
 
     private static String buildReservationRejectedTemplate(String candidatName, String formateurName, com.projet.jee.models.Reservation r, String reason) {
@@ -246,6 +301,4 @@ public class EmailUtil {
                 "<p>Cordialement,<br/>L'équipe InterviewPro</p>" +
                 "</body></html>";
     }
-
-
 }

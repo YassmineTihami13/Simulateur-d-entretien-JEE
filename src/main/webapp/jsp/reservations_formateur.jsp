@@ -294,7 +294,7 @@
             <div class="alert alert-success" style="background: #D1FAE5; color: #065F46; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #A7F3D0;">
                 <i class="fas fa-check-circle"></i>
                 <% if ("accepted".equals(success)) { %>
-                    Réservation acceptée avec succès
+                    Réservation acceptée avec succès et email envoyé au candidat
                 <% } else if ("rejected".equals(success)) { %>
                     Réservation refusée avec succès
                 <% } %>
@@ -379,13 +379,9 @@
                             </td>
                             <td>
                                 <% if ("EN_ATTENTE".equals(statut)) { %>
-                                    <form method="post" action="<%= request.getContextPath() %>/reservationAction" style="display:inline;">
-                                        <input type="hidden" name="reservationId" value="<%= r.getId() %>">
-                                        <input type="hidden" name="action" value="accept">
-                                        <button type="submit" class="btn-icon btn-edit" title="Accepter">
-                                            <i class="fas fa-check"></i> Accepter
-                                        </button>
-                                    </form>
+                                    <button class="btn-icon btn-edit" onclick="openAcceptModal(<%= r.getId() %>)" title="Accepter">
+                                        <i class="fas fa-check"></i> Accepter
+                                    </button>
 
                                     <button class="btn-icon btn-delete" onclick="openRejectModal(<%= r.getId() %>)" title="Refuser">
                                         <i class="fas fa-times"></i> Refuser
@@ -423,6 +419,32 @@
             <div class="cv-modal-body">
                 <iframe id="cvIframe" class="cv-iframe" src=""></iframe>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal d'acceptation avec lien de session -->
+    <div id="acceptModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Accepter la réservation</h2>
+                <button class="close-btn" onclick="closeAcceptModal()">&times;</button>
+            </div>
+            <form method="post" action="<%= request.getContextPath() %>/acceptReservation">
+                <input type="hidden" name="reservationId" id="acceptReservationId" value="">
+                <div class="form-group">
+                    <label for="sessionLink">Lien de la session (Google Meet ou Zoom)</label>
+                    <input type="url" id="sessionLink" name="sessionLink" 
+                           placeholder="https://meet.google.com/xxx-xxxx-xxx ou https://zoom.us/j/xxxxxxxxx"
+                           required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                        Collez le lien Google Meet ou Zoom de votre session
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeAcceptModal()">Annuler</button>
+                    <button type="submit" class="btn-primary">Confirmer et envoyer</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -486,6 +508,16 @@
             }
         });
 
+        function openAcceptModal(reservationId) {
+            document.getElementById('acceptReservationId').value = reservationId;
+            document.getElementById('sessionLink').value = '';
+            document.getElementById('acceptModal').style.display = 'flex';
+        }
+
+        function closeAcceptModal() {
+            document.getElementById('acceptModal').style.display = 'none';
+        }
+
         function openRejectModal(reservationId) {
             document.getElementById('rejectReservationId').value = reservationId;
             document.getElementById('reason').value = '';
@@ -498,6 +530,9 @@
 
         // Fermer modal clic en dehors
         window.onclick = function(event) {
+            var modal = document.getElementById('acceptModal');
+            if (event.target === modal) closeAcceptModal();
+            
             var modal = document.getElementById('rejectModal');
             if (event.target === modal) closeRejectModal();
             
@@ -509,6 +544,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCvModal();
+                closeAcceptModal();
                 closeRejectModal();
             }
         });

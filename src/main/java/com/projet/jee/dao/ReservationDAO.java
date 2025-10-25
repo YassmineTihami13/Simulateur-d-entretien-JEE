@@ -37,7 +37,7 @@ public class ReservationDAO {
     public List<ReservationDetails> getReservationsDetailsByFormateurId(long formateurId) throws SQLException {
         List<ReservationDetails> list = new ArrayList<>();
         String sql = "SELECT r.id, r.dateReservation, r.duree, r.prix, r.statut, " +
-                "r.candidat_id, r.formateur_id, " +
+                "r.candidat_id, r.formateur_id, r.session_link, " +
                 "u.nom, u.prenom, u.email, " +
                 "c.cv " +
                 "FROM reservation r " +
@@ -67,6 +67,7 @@ public class ReservationDAO {
                     rd.setPrix(rs.getDouble("prix"));
                     rd.setCandidatId(rs.getLong("candidat_id"));
                     rd.setFormateurId(rs.getLong("formateur_id"));
+                    rd.setSessionLink(rs.getString("session_link"));
 
                     // Informations du candidat
                     rd.setCandidatNom(rs.getString("nom"));
@@ -95,7 +96,7 @@ public class ReservationDAO {
      */
     public List<Reservation> getReservationsByFormateurId(long formateurId) throws SQLException {
         List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT id, dateReservation, duree, prix, candidat_id, formateur_id, statut " +
+        String sql = "SELECT id, dateReservation, duree, prix, candidat_id, formateur_id, statut, session_link " +
                 "FROM reservation WHERE formateur_id = ? ORDER BY dateReservation DESC, id DESC";
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,6 +111,7 @@ public class ReservationDAO {
                     r.setPrix(rs.getDouble("prix"));
                     r.setCandidatId(rs.getLong("candidat_id"));
                     r.setFormateurId(rs.getLong("formateur_id"));
+                    r.setSessionLink(rs.getString("session_link"));
 
                     String statutStr = rs.getString("statut");
                     if (statutStr != null) {
@@ -131,6 +133,33 @@ public class ReservationDAO {
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, statutToDb(nouveauStatut));
+            ps.setLong(2, reservationId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Met à jour le statut d'une réservation avec le lien de session.
+     */
+    public boolean updateReservationStatus(long reservationId, Statut nouveauStatut, String rejectionReason, String sessionLink) throws SQLException {
+        String sql = "UPDATE reservation SET statut = ?, session_link = ? WHERE id = ?";
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, statutToDb(nouveauStatut));
+            ps.setString(2, sessionLink);
+            ps.setLong(3, reservationId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Met à jour seulement le lien de session
+     */
+    public boolean updateSessionLink(long reservationId, String sessionLink) throws SQLException {
+        String sql = "UPDATE reservation SET session_link = ? WHERE id = ?";
+        try (Connection conn = ConnectionBD.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, sessionLink);
             ps.setLong(2, reservationId);
             return ps.executeUpdate() > 0;
         }
@@ -161,7 +190,7 @@ public class ReservationDAO {
      * Récupère les détails d'une réservation
      */
     public Reservation getReservationById(long id) throws SQLException {
-        String sql = "SELECT id, dateReservation, duree, prix, candidat_id, formateur_id, statut " +
+        String sql = "SELECT id, dateReservation, duree, prix, candidat_id, formateur_id, statut, session_link " +
                 "FROM reservation WHERE id = ?";
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -176,6 +205,7 @@ public class ReservationDAO {
                     r.setPrix(rs.getDouble("prix"));
                     r.setCandidatId(rs.getLong("candidat_id"));
                     r.setFormateurId(rs.getLong("formateur_id"));
+                    r.setSessionLink(rs.getString("session_link"));
 
                     String statutStr = rs.getString("statut");
                     if (statutStr != null) r.setStatut(statutFromDb(statutStr));
