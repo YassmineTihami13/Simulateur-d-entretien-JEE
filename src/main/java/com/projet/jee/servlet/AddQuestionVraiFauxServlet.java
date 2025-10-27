@@ -49,21 +49,18 @@ public class AddQuestionVraiFauxServlet extends HttpServlet {
 
             // Lecture des paramètres
             String contenu = request.getParameter("contenu");
-            String domaine = request.getParameter("domaine");
             String difficulteStr = request.getParameter("difficulte");
             String reponseCorrecteStr = request.getParameter("reponseCorrecte");
             String explication = request.getParameter("explication");
 
             System.out.println("=== [Paramètres reçus] ===");
             System.out.println("contenu: " + contenu);
-            System.out.println("domaine: " + domaine);
             System.out.println("difficulte: " + difficulteStr);
             System.out.println("reponseCorrecte: " + reponseCorrecteStr);
             System.out.println("explication: " + explication);
 
             // Vérification des champs obligatoires
             if (contenu == null || contenu.trim().isEmpty() ||
-                domaine == null || domaine.trim().isEmpty() ||
                 difficulteStr == null || difficulteStr.trim().isEmpty() ||
                 reponseCorrecteStr == null || reponseCorrecteStr.trim().isEmpty()) {
 
@@ -81,7 +78,6 @@ public class AddQuestionVraiFauxServlet extends HttpServlet {
             // Création de l’objet question
             QuestionVraiFaux question = new QuestionVraiFaux();
             question.setContenu(contenu);
-            question.setDomaine(domaine);
             question.setDifficulte(difficulte);
             question.setTypeQuestion(Question.TypeQuestion.VRAI_FAUX);
             question.setReponseCorrecte(reponseCorrecte);

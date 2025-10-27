@@ -9,9 +9,6 @@ import java.sql.*;
 
 public class UtilisateurDAO {
 
-    /**
-     * Vérifie si un email existe déjà dans la base de données
-     */
     public boolean emailExists(String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM utilisateur WHERE email = ?";
 

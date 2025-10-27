@@ -1,29 +1,20 @@
-// adminCandidats.js - Gestion des candidats
-
-// Variables globales
 let currentCandidatId = null;
 let currentNewStatus = null;
 let currentCandidatData = null;
 
-
-// ==================== MODAL DE DÉTAILS ====================
-
-/**
- * Affiche les détails d'un candidat
- */
+let currentCvUrl = '';
+let currentCvFileName = '';
 function viewCandidat(candidatId) {
     const modal = document.getElementById('candidatModal');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const candidatDetails = document.getElementById('candidatDetails');
     const errorMessage = document.getElementById('errorMessage');
 
-    // Réinitialiser l'affichage
     loadingSpinner.style.display = 'flex';
     candidatDetails.style.display = 'none';
     errorMessage.style.display = 'none';
     modal.style.display = 'flex';
 
-    // Récupérer les détails du candidat
     fetch(`${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.indexOf('/admin'))}/admin/candidat-details?id=${candidatId}`)
         .then(response => {
             if (!response.ok) {
@@ -43,7 +34,6 @@ function viewCandidat(candidatId) {
             document.getElementById('errorText').textContent = error.message;
         });
 }
-
 /**
  * Affiche les détails du candidat dans le modal
  */
@@ -72,13 +62,11 @@ function displayCandidatDetails(candidat) {
     // CV
     displayCvInfo(candidat);
 }
-/**
- * Affiche les informations du CV avec une interface améliorée
- */
+
 function displayCvInfo(candidat) {
     const cvInfo = document.getElementById('cvInfo');
 
-    if (candidat.hasCv && candidat.cvViewUrl && candidat.cvDownloadUrl) {
+    if (candidat.hasCv && candidat.cvViewUrl) {
         const cvFileName = candidat.cvFileName || `CV_${candidat.prenom}_${candidat.nom}.pdf`;
 
         cvInfo.innerHTML = `
@@ -87,53 +75,20 @@ function displayCvInfo(candidat) {
                 <div class="cv-info">
                     <div class="cv-name">${cvFileName}</div>
                     <div class="cv-description">
-                        Le candidat a fourni son CV. Vous pouvez le visualiser directement dans le navigateur
-                        ou le télécharger pour une consultation hors ligne. Le fichier est au format PDF.
+                        CV disponible - Cliquez sur "Voir CV" pour visualiser le document
                     </div>
                 </div>
                 <div class="cv-actions">
-                    <a href="${candidat.cvViewUrl}" target="_blank" class="btn-cv-action btn-cv-view">
+                    <button class="btn-cv-action btn-cv-view" onclick="openCvModal('${candidat.cvViewUrl}', '${cvFileName}')">
                         <i class="fas fa-eye"></i>
-                        Visualiser le CV
-                    </a>
+                        Voir CV
+                    </button>
+                    ${candidat.cvDownloadUrl ? `
                     <a href="${candidat.cvDownloadUrl}" download="${cvFileName}" class="btn-cv-action btn-cv-download">
                         <i class="fas fa-download"></i>
                         Télécharger
                     </a>
-                </div>
-            </div>
-
-            <div class="cv-preview-section">
-                <div class="cv-preview-header">
-                    <div class="cv-preview-title">
-                        <i class="fas fa-search"></i> Prévisualisation du CV
-                    </div>
-                    <div class="cv-preview-actions">
-                        <a href="${candidat.cvViewUrl}" target="_blank" class="btn-preview-action">
-                            <i class="fas fa-expand"></i> Plein écran
-                        </a>
-                        <a href="${candidat.cvDownloadUrl}" download="${cvFileName}" class="btn-preview-action">
-                            <i class="fas fa-download"></i> Télécharger
-                        </a>
-                    </div>
-                </div>
-                <div class="cv-preview-container">
-                    <div class="cv-loading" id="cvLoading">
-                        <div class="spinner"></div>
-                        <p>Chargement du CV...</p>
-                    </div>
-                    <iframe
-                        src="${candidat.cvViewUrl}"
-                        class="cv-preview-frame"
-                        id="cvFrame"
-                        onload="document.getElementById('cvLoading').style.display = 'none';"
-                        onerror="document.getElementById('cvLoading').innerHTML = '<i class=\\'fas fa-exclamation-triangle\\' style=\\'font-size: 2rem; margin-bottom: 12px;\\'></i><p>Erreur lors du chargement du CV</p>';"
-                        title="CV de ${candidat.prenom} ${candidat.nom}">
-                    </iframe>
-                    <div class="cv-preview-note">
-                        <i class="fas fa-info-circle"></i>
-                        Si la prévisualisation ne s'affiche pas correctement, utilisez le bouton "Visualiser le CV"
-                    </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -144,13 +99,11 @@ function displayCvInfo(candidat) {
                 <h4>Aucun CV disponible</h4>
                 <p>
                     Ce candidat n'a pas encore téléchargé de CV sur la plateforme.
-                    Vous pouvez lui demander d'ajouter son CV depuis son espace personnel.
                 </p>
             </div>
         `;
     }
 }
-
 /**
  * Fonction utilitaire pour afficher/masquer la prévisualisation
  */
@@ -391,91 +344,6 @@ function editCandidat(candidatId) {
         });
 }
 
-// Fonction pour afficher les détails du candidat
-function viewCandidat(candidatId) {
-    const modal = document.getElementById('candidatModal');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const candidatDetails = document.getElementById('candidatDetails');
-    const errorMessage = document.getElementById('errorMessage');
-
-    modal.style.display = 'flex';
-    loadingSpinner.style.display = 'block';
-    candidatDetails.style.display = 'none';
-    errorMessage.style.display = 'none';
-
-    fetch(getContextPath() + '/admin/candidat-details?id=' + candidatId)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur réseau: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            loadingSpinner.style.display = 'none';
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            document.getElementById('candidatAvatarLarge').textContent =
-                data.prenom.charAt(0) + data.nom.charAt(0);
-            document.getElementById('candidatNomComplet').textContent =
-                data.prenom + ' ' + data.nom;
-            document.getElementById('candidatEmail').textContent = data.email;
-
-            const domaineElement = document.getElementById('candidatDomaine');
-            if (data.domaineProfessionnel && data.domaineProfessionnel.trim() !== '') {
-                domaineElement.textContent = data.domaineProfessionnel;
-            } else {
-                domaineElement.innerHTML = '<em style="color: #9CA3AF;">Non spécifié</em>';
-            }
-
-            const statutElement = document.getElementById('candidatStatut');
-            if (data.statut) {
-                statutElement.innerHTML = '<span class="status-badge status-active"><i class="fas fa-check-circle"></i> Actif</span>';
-            } else {
-                statutElement.innerHTML = '<span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactif</span>';
-            }
-
-            const verificationElement = document.getElementById('candidatVerification');
-            if (data.estVerifie) {
-                verificationElement.innerHTML = '<span class="status-badge status-verified"><i class="fas fa-check-circle"></i> Compte vérifié</span>';
-            } else {
-                verificationElement.innerHTML = '<span class="status-badge status-unverified"><i class="fas fa-exclamation-circle"></i> Compte non vérifié</span>';
-            }
-
-            const cvInfo = document.getElementById('cvInfo');
-            cvInfo.innerHTML = '';
-
-            if (data.hasCv && data.cvFileName) {
-                cvInfo.innerHTML = `
-                    <div class="cv-item">
-                        <i class="fas fa-file-pdf" style="color: #e74c3c; font-size: 1.5rem;"></i>
-                        <span class="cv-name">${data.cvFileName}</span>
-                        <span class="cv-status-badge" style="background: #10B981; color: white;">
-                            Disponible
-                        </span>
-                    </div>
-                `;
-            } else {
-                cvInfo.innerHTML = `
-                    <div class="no-cv">
-                        <i class="fas fa-file-alt"></i>
-                        <p>Aucun CV fourni</p>
-                    </div>
-                `;
-            }
-
-            candidatDetails.style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            loadingSpinner.style.display = 'none';
-            errorMessage.style.display = 'block';
-            document.getElementById('errorText').textContent = error.message;
-        });
-}
-
 // Fonction pour fermer le modal
 function closeModal() {
     document.getElementById('candidatModal').style.display = 'none';
@@ -644,3 +512,80 @@ document.addEventListener('DOMContentLoaded', function() {
 function getContextPath() {
     return window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
 }
+
+function openCvModal(cvUrl, fileName) {
+    currentCvUrl = cvUrl;
+    currentCvFileName = fileName;
+
+    const modal = document.getElementById('cvModal');
+    const loading = document.getElementById('cvModalLoading');
+    const frame = document.getElementById('cvFrame');
+    const error = document.getElementById('cvError');
+    const title = document.getElementById('cvModalTitle');
+
+    // Réinitialiser l'affichage
+    modal.style.display = 'flex';
+    loading.style.display = 'flex';
+    frame.style.display = 'none';
+    error.style.display = 'none';
+    title.textContent = `CV - ${fileName}`;
+
+    // Charger le CV dans l'iframe
+    frame.onload = function() {
+        loading.style.display = 'none';
+        frame.style.display = 'block';
+    };
+
+    frame.onerror = function() {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+    };
+
+    frame.src = cvUrl;
+}
+
+/**
+ * Ferme le modal CV
+ */
+function closeCvModal() {
+    document.getElementById('cvModal').style.display = 'none';
+    const frame = document.getElementById('cvFrame');
+    frame.src = ''; // Vider l'iframe
+    currentCvUrl = '';
+    currentCvFileName = '';
+}
+
+/**
+ * Télécharge le CV actuellement affiché
+ */
+function downloadCurrentCv() {
+    if (currentCvUrl) {
+        const link = document.createElement('a');
+        link.href = currentCvUrl;
+        link.download = currentCvFileName;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+/**
+ * Ouvre le CV en plein écran
+ */
+function openCvFullscreen() {
+    if (currentCvUrl) {
+        window.open(currentCvUrl, '_blank', 'width=1200,height=800,scrollbars=yes');
+    }
+}
+
+/**
+ * Ferme le modal CV en cliquant à l'extérieur
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('cvModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeCvModal();
+        }
+    });
+});

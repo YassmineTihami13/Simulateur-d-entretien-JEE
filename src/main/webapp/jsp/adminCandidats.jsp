@@ -389,6 +389,40 @@
         </div>
     </div>
 
+<!-- Modal pour visualiser le CV -->
+<div id="cvModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 90%; height: 90%;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="cvModalTitle">Visualisation du CV</h3>
+            <div class="cv-modal-actions">
+                <button class="btn-preview-action" onclick="downloadCurrentCv()" id="downloadCvBtn">
+                    <i class="fas fa-download"></i> Télécharger
+                </button>
+                <button class="btn-preview-action" onclick="openCvFullscreen()" id="fullscreenCvBtn">
+                    <i class="fas fa-expand"></i> Plein écran
+                </button>
+                <button class="modal-close" onclick="closeCvModal()">&times;</button>
+            </div>
+        </div>
+        <div class="modal-body" style="padding: 0; height: calc(100% - 80px);">
+            <div class="cv-loading" id="cvModalLoading">
+                <div class="spinner"></div>
+                <p>Chargement du CV...</p>
+            </div>
+            <iframe
+                id="cvFrame"
+                class="cv-preview-frame"
+                style="width: 100%; height: 100%; border: none; display: none;"
+                title="CV du candidat">
+            </iframe>
+            <div id="cvError" style="display: none; text-align: center; padding: 40px; color: #DC2626;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 16px;"></i>
+                <h3>Erreur lors du chargement du CV</h3>
+                <p>Impossible de charger le CV. Veuillez réessayer ou utiliser le téléchargement.</p>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- Modal de résultat -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 500px;">

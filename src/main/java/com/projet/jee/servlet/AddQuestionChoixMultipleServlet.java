@@ -32,8 +32,13 @@ public class AddQuestionChoixMultipleServlet extends HttpServlet {
             java.util.Enumeration<String> paramNames = request.getParameterNames();
             while (paramNames.hasMoreElements()) {
                 String paramName = paramNames.nextElement();
-                String paramValue = request.getParameter(paramName);
-                System.out.println(paramName + " = " + paramValue);
+                if (paramName.startsWith("choixTexte") || paramName.startsWith("estCorrect")) {
+                    String[] values = request.getParameterValues(paramName);
+                    System.out.println(paramName + " = " + java.util.Arrays.toString(values));
+                } else {
+                    String paramValue = request.getParameter(paramName);
+                    System.out.println(paramName + " = " + paramValue);
+                }
             }
             System.out.println("=== FIN PARAMÈTRES ===");
 
@@ -54,16 +59,13 @@ public class AddQuestionChoixMultipleServlet extends HttpServlet {
 
             // Récupération des paramètres
             String contenu = request.getParameter("contenu");
-            String domaine = request.getParameter("domaine");
             String difficulteStr = request.getParameter("difficulte");
             String nbChoixStr = request.getParameter("nbChoix");
 
-            System.out.println("Paramètres principaux: contenu=" + contenu + ", domaine=" + domaine +
-                               ", difficulte=" + difficulteStr + ", nbChoix=" + nbChoixStr);
+            System.out.println("Paramètres principaux: contenu=" + contenu + ",  difficulte=" + difficulteStr + ", nbChoix=" + nbChoixStr);
 
             // Validation des champs obligatoires
             if (contenu == null || contenu.trim().isEmpty() ||
-                domaine == null || domaine.trim().isEmpty() ||
                 difficulteStr == null || difficulteStr.trim().isEmpty() ||
                 nbChoixStr == null || nbChoixStr.trim().isEmpty()) {
                 
@@ -76,28 +78,54 @@ public class AddQuestionChoixMultipleServlet extends HttpServlet {
             try {
                 nbChoix = Integer.parseInt(nbChoixStr);
             } catch (NumberFormatException e) {
-                System.out.println("Format de nbChoix invalide: " + nbChoixStr);
-                out.write("{\"success\":false, \"message\":\"Nombre de choix invalide.\"}");
+                System.out.println("Format de nombre invalide: nbChoix=" + nbChoixStr);
+                out.write("{\"success\":false, \"message\":\"Données invalides.\"}");
+                return;
+            }
+
+            // Récupérer tous les choix et leurs statuts
+            String[] choixTextes = request.getParameterValues("choixTexte[]");
+            String[] estCorrectArray = request.getParameterValues("estCorrect[]");
+            
+            if (choixTextes == null || estCorrectArray == null || 
+                choixTextes.length != nbChoix || estCorrectArray.length != nbChoix) {
+                System.out.println("Nombre de choix incohérent: attendu=" + nbChoix + 
+                                 ", textes reçus=" + (choixTextes != null ? choixTextes.length : 0) +
+                                 ", correct reçus=" + (estCorrectArray != null ? estCorrectArray.length : 0));
+                out.write("{\"success\":false, \"message\":\"Nombre de choix incohérent.\"}");
                 return;
             }
 
             // Validation des choix
-            for (int i = 1; i <= nbChoix; i++) {
-                String texte = request.getParameter("choix" + i);
+            for (int i = 0; i < choixTextes.length; i++) {
+                String texte = choixTextes[i];
                 System.out.println("Choix " + i + " - texte reçu: '" + texte + "'");
                 
                 if (texte == null || texte.trim().isEmpty()) {
                     System.out.println("Choix " + i + " est vide !");
-                    out.write("{\"success\":false, \"message\":\"Le texte du choix " + i + " ne peut pas être vide.\"}");
+                    out.write("{\"success\":false, \"message\":\"Le texte du choix " + (i+1) + " ne peut pas être vide.\"}");
                     return;
                 }
+            }
+
+            // Vérifier qu'un seul choix est marqué comme correct
+            int countCorrect = 0;
+            for (String estCorrect : estCorrectArray) {
+                if ("true".equals(estCorrect)) {
+                    countCorrect++;
+                }
+            }
+            
+            if (countCorrect != 1) {
+                System.out.println("Nombre de réponses correctes invalide: " + countCorrect);
+                out.write("{\"success\":false, \"message\":\"Une et une seule réponse doit être correcte.\"}");
+                return;
             }
 
             Question.Difficulte difficulte = Question.Difficulte.valueOf(difficulteStr);
 
             QuestionChoixMultiple question = new QuestionChoixMultiple();
             question.setContenu(contenu.trim());
-            question.setDomaine(domaine.trim());
             question.setDifficulte(difficulte);
             question.setTypeQuestion(Question.TypeQuestion.CHOIX_MULTIPLE);
             question.setDateCreation(LocalDate.now());
@@ -105,12 +133,12 @@ public class AddQuestionChoixMultipleServlet extends HttpServlet {
 
             System.out.println("Création de la question QCM terminée, récupération des choix...");
 
-            // Ajout des choix
-            for (int i = 1; i <= nbChoix; i++) {
-                String texte = request.getParameter("choix" + i);
-                boolean estCorrect = "on".equals(request.getParameter("correct" + i));
+            // Ajout des choix avec leur statut correct/incorrect
+            for (int i = 0; i < choixTextes.length; i++) {
+                String texte = choixTextes[i].trim();
+                boolean estCorrect = "true".equals(estCorrectArray[i]);
 
-                Choix c = new Choix(0, texte.trim(), estCorrect, 0);
+                Choix c = new Choix(0, texte, estCorrect, 0);
                 question.addChoix(c);
 
                 System.out.println("Choix " + i + ": texte='" + texte + "', estCorrect=" + estCorrect);

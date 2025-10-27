@@ -1254,3 +1254,170 @@ body {
         justify-content: space-between;
     }
 }
+
+/* Styles pour les boutons d'action CV */
+.cv-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.btn-cv-action {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cv-view {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: 2px solid #3b82f6;
+}
+
+.btn-cv-view:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-cv-download {
+    background: white;
+    color: #6366f1;
+    border: 2px solid #6366f1;
+}
+
+.btn-cv-download:hover {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+    .cv-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .cv-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-cv-action {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+/* Styles pour le modal CV */
+.cv-modal-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-preview-action {
+    padding: 8px 16px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border: 1px solid #6366f1;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-preview-action:hover {
+    background: #6366f1;
+    color: white;
+}
+
+/* Amélioration des boutons CV */
+.cv-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.btn-cv-action {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn-cv-view {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.btn-cv-view:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-cv-download {
+    background: white;
+    color: #6366f1;
+    border: 2px solid #6366f1;
+}
+
+.btn-cv-download:hover {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Responsive pour le modal CV */
+@media (max-width: 768px) {
+    .cv-modal-actions {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .btn-preview-action {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cv-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-cv-action {
+        width: 100%;
+        min-width: auto;
+    }
+}

@@ -56,7 +56,7 @@ public class QuestionDAO {
         String contenu = rs.getString("contenu");
         String typeStr = rs.getString("typeQuestion");
         String difficulteStr = rs.getString("difficulte");
-        String domaine = rs.getString("domaine");
+      
         Date dateCreation = rs.getDate("dateCreation");
         long createurId = rs.getLong("createur_id");
 
@@ -82,7 +82,8 @@ public class QuestionDAO {
         question.setContenu(contenu);
         question.setTypeQuestion(type);
         question.setDifficulte(difficulte);
-        question.setDomaine(domaine);
+
+
         question.setDateCreation(dateCreation.toLocalDate());
         question.setCreateurId(createurId);
 
@@ -107,10 +108,30 @@ public class QuestionDAO {
 
     private QuestionChoixMultiple createQuestionChoixMultiple(long questionId, ResultSet rs) throws SQLException {
         QuestionChoixMultiple qcm = new QuestionChoixMultiple();
-        // Les choix seront chargés séparément si nécessaire
+        qcm.setId(questionId);
+        qcm.setChoixList(getChoixForQuestion(questionId));
         return qcm;
     }
 
+    private List<Choix> getChoixForQuestion(long questionId) throws SQLException {
+        List<Choix> choixList = new ArrayList<>();
+        String sql = "SELECT * FROM choix WHERE question_id = ?";
+
+        try (Connection con = ConnectionBD.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, questionId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Choix choix = new Choix();
+                choix.setId(rs.getLong("id"));
+                choix.setTexte(rs.getString("texte"));
+                choix.setEstCorrect(rs.getBoolean("estCorrect"));
+                choixList.add(choix);
+            }
+        }
+        return choixList;
+    }
     private QuestionReponse createQuestionReponse(long questionId, ResultSet rs) throws SQLException {
         String sql = "SELECT * FROM questionreponse WHERE id = ?";
         try (Connection con = ConnectionBD.getConnection();
@@ -133,14 +154,14 @@ public class QuestionDAO {
             con.setAutoCommit(false);
 
             // Insérer dans la table question
-            String sqlQuestion = "INSERT INTO question (contenu, typeQuestion, difficulte, domaine, dateCreation, createur_id) VALUES (?, ?, ?, ?, ?, ?)";
+            String sqlQuestion = "INSERT INTO question (contenu, typeQuestion, difficulte,  dateCreation, createur_id) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement psQuestion = con.prepareStatement(sqlQuestion, Statement.RETURN_GENERATED_KEYS);
             psQuestion.setString(1, question.getContenu());
             psQuestion.setString(2, question.getTypeQuestion().name());
             psQuestion.setString(3, question.getDifficulte().name());
-            psQuestion.setString(4, question.getDomaine());
-            psQuestion.setDate(5, Date.valueOf(question.getDateCreation()));
-            psQuestion.setLong(6, question.getCreateurId());
+         
+            psQuestion.setDate(4, Date.valueOf(question.getDateCreation()));
+            psQuestion.setLong(5, question.getCreateurId());
 
             int affectedRows = psQuestion.executeUpdate();
             if (affectedRows == 0) {
