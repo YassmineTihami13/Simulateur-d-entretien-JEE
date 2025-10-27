@@ -61,7 +61,11 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/dashboardFormateur");
                     
                 }  else if ("CANDIDAT".equals(role)) {
-                    response.sendRedirect(request.getContextPath() + "/jsp/condidat.jsp");
+                    // Enregistrer l'ID du candidat dans la session
+                    session.setAttribute("candidatId", userId);
+                    // Rediriger vers la servlet du dashboard candidat
+                    response.sendRedirect(request.getContextPath() + "/candidat/dashboard");
+                    
                 } else if ("ADMIN".equals(role)) {
                     response.sendRedirect(request.getContextPath() + "/jsp/adminDashboard.jsp");
                 } else {

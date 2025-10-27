@@ -12,10 +12,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <!-- Font Awesome CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- ajoute ceci dans <head> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
 </head>
 <body data-bs-spy="scroll" data-bs-target=".navbar">
     <!-- Navigation -->
@@ -63,7 +63,7 @@
                             <span class="badge-text">Plateforme 2025 Lancée</span>
                         </div>
                         <h1 class="hero-title">
-                            Devenez 
+                            Devenez
                             <span class="text-typing" id="typing-text"></span>
                             en Entretien
                         </h1>
@@ -71,7 +71,7 @@
                             La première plateforme dédiée à la préparation aux entretiens.
                             <strong>87% de nos utilisateurs</strong> décrochent leur emploi dans les 3 mois.
                         </p>
-                        
+
                         <div class="hero-features">
                             <div class="feature-check">
                                 <i class="fas fa-check-circle text-success"></i>
@@ -115,7 +115,7 @@
                 <div class="col-lg-6">
                     <div class="hero-visual animate__animated animate__fadeInRight">
                         <div class="floating-elements">
-                        
+
                             <div class="floating-card card-2">
                                 <div class="progress-ring">
                                     <svg width="80" height="80">
@@ -131,17 +131,17 @@
                             </div>
                         </div>
                         <div class="main-hero-image">
-                            <img src="https://www.stepstone.be/wp-content/uploads/2021/03/Product-video-thumbnail-7.png" 
+                            <img src="https://www.stepstone.be/wp-content/uploads/2021/03/Product-video-thumbnail-7.png"
                                  alt="Simulation entretien" class="img-fluid rounded-3 shadow-lg">
                             <div class="hero-image-overlay">
-                                
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="scroll-indicator">
             <a href="#features" class="scroll-button">
                 <i class="fas fa-chevron-down"></i>
@@ -208,7 +208,7 @@
         </div>
     </section>
 
-   
+
 <!-- Stats Section -->
 <section id="stats" class="stats-section">
     <div class="container">
@@ -244,7 +244,7 @@
         </div>
     </div>
 </section>
-    
+
         <!-- Testimonials Section -->
     <section id="testimonials" class="testimonials-sectionn">
         <div class="container">
@@ -258,7 +258,7 @@
                     <div class="testimonial-card">
                         <div class="testimonial-header">
                             <div class="client-avatar">
-                                <img src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?cs=srgb&dl=pexels-olly-733872.jpg&fm=jpg" 
+                                <img src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?cs=srgb&dl=pexels-olly-733872.jpg&fm=jpg"
                                      alt="Marie Dubois">
                             </div>
                             <div class="client-info">
@@ -289,7 +289,7 @@
                     <div class="testimonial-card">
                         <div class="testimonial-header">
                             <div class="client-avatar">
-                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" 
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
                                      alt="Thomas Martin">
                             </div>
                             <div class="client-info">
@@ -320,7 +320,7 @@
                     <div class="testimonial-card">
                         <div class="testimonial-header">
                             <div class="client-avatar">
-                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" 
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
                                      alt="Sophie Laurent">
                             </div>
                             <div class="client-info">
@@ -388,7 +388,7 @@
                 <p class="cta-subtitle">Rejoignez les milliers de candidats qui ont déjà décroché leur emploi de rêve</p>
                 <div class="cta-buttons">
                     <a href="register.jsp" class="btn btn-primary btn-lg pulse-button">
-                        <i class="fas fa-rocket me-2"></i>Commencer maintenant 
+                        <i class="fas fa-rocket me-2"></i>Commencer maintenant
                     </a>
                 </div>
                 <div class="cta-features">

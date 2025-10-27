@@ -13,5 +13,9 @@ public class QuestionChoixMultiple extends Question {
 	public List<Choix> getChoixList() {
 	    return choixList;
 	}
+	public void setChoixList(List<Choix> choixList) {
+	    this.choixList = choixList;
+	}
+
 
 }

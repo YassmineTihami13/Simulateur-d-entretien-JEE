@@ -108,10 +108,30 @@ public class QuestionDAO {
 
     private QuestionChoixMultiple createQuestionChoixMultiple(long questionId, ResultSet rs) throws SQLException {
         QuestionChoixMultiple qcm = new QuestionChoixMultiple();
-        // Les choix seront chargés séparément si nécessaire
+        qcm.setId(questionId);
+        qcm.setChoixList(getChoixForQuestion(questionId));
         return qcm;
     }
 
+    private List<Choix> getChoixForQuestion(long questionId) throws SQLException {
+        List<Choix> choixList = new ArrayList<>();
+        String sql = "SELECT * FROM choix WHERE question_id = ?";
+
+        try (Connection con = ConnectionBD.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, questionId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Choix choix = new Choix();
+                choix.setId(rs.getLong("id"));
+                choix.setTexte(rs.getString("texte"));
+                choix.setEstCorrect(rs.getBoolean("estCorrect"));
+                choixList.add(choix);
+            }
+        }
+        return choixList;
+    }
     private QuestionReponse createQuestionReponse(long questionId, ResultSet rs) throws SQLException {
         String sql = "SELECT * FROM questionreponse WHERE id = ?";
         try (Connection con = ConnectionBD.getConnection();
