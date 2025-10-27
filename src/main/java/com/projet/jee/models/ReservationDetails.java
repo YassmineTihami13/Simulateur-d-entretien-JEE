@@ -1,6 +1,7 @@
 package com.projet.jee.models;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class ReservationDetails {
     private long id;
@@ -12,6 +13,12 @@ public class ReservationDetails {
     private Long disponibiliteId;
     private Reservation.Statut statut;
     private String sessionLink;
+    private boolean peutEtreEvaluee; 
+
+    // Nouveaux champs pour la session
+    private LocalDate dateSession;
+    private LocalTime heureDebut;
+    private LocalTime heureFin;
 
     // Nouveaux champs pour les détails
     private String candidatNom;
@@ -48,7 +55,20 @@ public class ReservationDetails {
     public Reservation.Statut getStatut() { return statut; }
     public void setStatut(Reservation.Statut statut) { this.statut = statut; }
 
-    // Getters & Setters pour les nouveaux champs
+    // Getters & Setters pour les nouveaux champs de session
+    public LocalDate getDateSession() { return dateSession; }
+    public void setDateSession(LocalDate dateSession) { this.dateSession = dateSession; }
+
+    public LocalTime getHeureDebut() { return heureDebut; }
+    public void setHeureDebut(LocalTime heureDebut) { this.heureDebut = heureDebut; }
+
+    public LocalTime getHeureFin() { return heureFin; }
+    public void setHeureFin(LocalTime heureFin) { this.heureFin = heureFin; }
+
+    // Getters & Setters pour les champs existants
+    public String getSessionLink() { return sessionLink; }
+    public void setSessionLink(String sessionLink) { this.sessionLink = sessionLink; }
+
     public String getCandidatNom() { return candidatNom; }
     public void setCandidatNom(String candidatNom) { this.candidatNom = candidatNom; }
 
@@ -61,8 +81,8 @@ public class ReservationDetails {
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
     
-    public String getSessionLink() { return sessionLink; }
-    public void setSessionLink(String sessionLink) { this.sessionLink = sessionLink; }
+    public boolean isPeutEtreEvaluee() { return peutEtreEvaluee; }
+    public void setPeutEtreEvaluee(boolean peutEtreEvaluee) { this.peutEtreEvaluee = peutEtreEvaluee; }
 
     // Méthodes utilitaires
     public String getNomCompletCandidat() {
@@ -104,6 +124,7 @@ public class ReservationDetails {
     public String toString() {
         return "ReservationDetails [id=" + id +
                 ", dateReservation=" + dateReservation +
+                ", dateSession=" + dateSession +
                 ", candidat=" + getNomCompletCandidat() +
                 ", statut=" + getStatutDisplayName() + "]";
     }
