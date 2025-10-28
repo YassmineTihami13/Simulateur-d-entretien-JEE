@@ -27,32 +27,25 @@ public class FichesRevisionServlet extends HttpServlet {
         Long userId = (Long) session.getAttribute("userId");
         String userRole = (String) session.getAttribute("userRole");
 
-        // Vérifier si l'utilisateur est un candidat connecté
         if (userId == null || !"CANDIDAT".equals(userRole)) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
-        // Récupérer le domaine du candidat
         String domaineCandidatEnum = getDomaineCandidatEnum(userId);
 
         if (domaineCandidatEnum == null) {
-            // Gérer le cas où le domaine n'est pas trouvé
             request.setAttribute("error", "Domaine du candidat non trouvé");
             request.getRequestDispatcher("/jsp/fichesRevision.jsp").forward(request, response);
             return;
         }
 
-        // Récupérer les paramètres de filtrage
         String difficulteParam = request.getParameter("difficulte");
 
-        // TOUJOURS utiliser le domaine du candidat, ignorer le paramètre domaine de la requête
         String domaineParam = domaineCandidatEnum;
 
-        // Récupérer les questions de type REPONSE pour le domaine du candidat
         List<QuestionReponse> questions = getQuestionsReponse(domaineParam, difficulteParam);
 
-        // Récupérer les réponses déjà données par le candidat
         Map<Long, String> reponsesCandidat = getReponsesCandidatMap(userId);
 
         request.setAttribute("questions", questions);
@@ -94,10 +87,8 @@ public class FichesRevisionServlet extends HttpServlet {
                         "WHERE q.typeQuestion = 'REPONSE'"
         );
 
-        // TOUJOURS filtrer par domaine (celui du candidat)
         sql.append(" AND q.domaine = ?");
 
-        // Ajouter le filtre de difficulté si spécifié
         if (difficulte != null && !difficulte.isEmpty()) {
             sql.append(" AND q.difficulte = ?");
         }

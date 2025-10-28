@@ -67,7 +67,22 @@ public class Utilisateur {
 
     public boolean isEstVerifie() { return estVerifie; }
     public void setEstVerifie(boolean estVerifie) { this.estVerifie = estVerifie; }
+    // Méthodes pour les badges de statut
+    public String getStatutDisplay() {
+        return this.statut ? "Actif" : "Inactif";
+    }
 
+    public String getStatutCssClass() {
+        return this.statut ? "status-active" : "status-inactive";
+    }
+
+    public String getEstVerifieDisplay() {
+        return this.estVerifie ? "Vérifié" : "Non vérifié";
+    }
+
+    public String getEstVerifieCssClass() {
+        return this.estVerifie ? "status-active" : "status-inactive";
+    }
     @Override
     public String toString() {
         return "Utilisateur [id=" + id + ", nom=" + nom + ", prenom=" + prenom + ", email=" + email + ", role=" + role + ", dateCreation=" + dateCreation + ",statut=" + statut +

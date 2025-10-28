@@ -21,7 +21,6 @@ public class CvViewServlet extends HttpServlet {
 
         String fileName = request.getParameter("file");
         
-        // Log pour debug
         System.out.println("Paramètre 'file' reçu pour CV: " + fileName);
         
         if (fileName == null || fileName.isEmpty()) {
@@ -30,11 +29,9 @@ public class CvViewServlet extends HttpServlet {
             return;
         }
 
-        // Décoder le nom de fichier
         fileName = java.net.URLDecoder.decode(fileName, "UTF-8");
         System.out.println("Nom de fichier CV décodé: " + fileName);
 
-        // Sécurité : vérifier que le fichier ne contient pas de chemins relatifs
         if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
             System.err.println("ERREUR: Tentative d'accès non autorisé au CV: " + fileName);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès non autorisé");
@@ -53,12 +50,10 @@ public class CvViewServlet extends HttpServlet {
             return;
         }
 
-        // Définir les headers pour l'affichage PDF
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
         response.setContentLength((int) file.length());
 
-        // Stream le fichier vers la réponse
         try (FileInputStream in = new FileInputStream(file);
              OutputStream out = response.getOutputStream()) {
 

@@ -21,7 +21,6 @@ public class ReponseCandidat {
         this.dateReponse = dateReponse;
     }
 
-    // Getters & Setters
     public long getId() {
         return id;
     }

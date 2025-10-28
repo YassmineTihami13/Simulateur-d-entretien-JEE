@@ -10,14 +10,10 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-/**
- * AdminCreator : crée un administrateur initial dans la base.
- */
+
 public class AdminCreator {
 
-    /**
-     * Hash SHA-256 du mot de passe
-     */
+
     public static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");

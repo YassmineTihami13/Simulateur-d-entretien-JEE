@@ -26,9 +26,7 @@ public class UtilisateurDAO {
         return false;
     }
 
-    /**
-     * Crée un nouveau candidat dans la base de données
-     */
+
     public boolean createCandidat(Candidat candidat) throws SQLException {
         Connection conn = null;
         PreparedStatement stmtUser = null;
@@ -38,7 +36,6 @@ public class UtilisateurDAO {
             conn = ConnectionBD.getConnection();
             conn.setAutoCommit(false); // Démarrer la transaction
 
-            // 1. Insérer dans la table utilisateur
             String sqlUser = "INSERT INTO utilisateur (nom, prenom, email, motDePasse, role, statut, estVerifie) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
 

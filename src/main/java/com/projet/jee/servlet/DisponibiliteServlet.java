@@ -31,7 +31,7 @@ public class DisponibiliteServlet extends HttpServlet {
 
         Formateur formateur = (Formateur) session.getAttribute("formateur");
         String action = request.getParameter("action");
-        String view = request.getParameter("view"); // "historique" ou null (actives)
+        String view = request.getParameter("view");
 
         if ("edit".equals(action)) {
             long id = Long.parseLong(request.getParameter("id"));
@@ -47,7 +47,6 @@ public class DisponibiliteServlet extends HttpServlet {
             }
         }
 
-        // Récupérer les disponibilités selon la vue
         List<Disponibilite> disponibilites;
         if ("historique".equals(view)) {
             disponibilites = dao.getHistoriqueDisponibilites(formateur.getId());
@@ -57,7 +56,6 @@ public class DisponibiliteServlet extends HttpServlet {
             request.setAttribute("isHistorique", false);
         }
 
-        // Vérifier pour chaque disponibilité son statut de réservation
         for (Disponibilite dispo : disponibilites) {
             boolean reservee = dao.isDisponibiliteReservee(dispo.getId());
             String statutReservation = dao.getStatutReservation(dispo.getId());
@@ -93,7 +91,6 @@ public class DisponibiliteServlet extends HttpServlet {
             LocalTime heureDebut = LocalTime.parse(heureDebutStr);
             LocalTime heureFin = LocalTime.parse(heureFinStr);
 
-            // Validation
             if (jour.isBefore(LocalDate.now())) {
                 request.setAttribute("errorMessage", "La date ne peut pas être dans le passé");
                 doGet(request, response);

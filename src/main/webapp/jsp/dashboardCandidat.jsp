@@ -31,8 +31,8 @@
                     <div class="dropdown">
                         <button class="dropdown-toggle">▼</button>
                         <div class="dropdown-menu">
-                            <a href="${pageContext.request.contextPath}/jsp/profile.jsp">👤 Mon Profil</a>
-                            <a href="${pageContext.request.contextPath}/jsp/settings.jsp">⚙️ Paramètres</a>
+                 <a href="${pageContext.request.contextPath}/profileCandidat.jsp">👤 Mon Profil</a>
+    <a href="${pageContext.request.contextPath}/jsp/settings.jsp">⚙️ Paramètres</a>
                             <hr>
                             <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout">🚪 Déconnexion</a>
                         </div>

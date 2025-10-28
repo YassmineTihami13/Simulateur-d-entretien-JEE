@@ -21,13 +21,13 @@ import java.util.UUID;
 
 @WebServlet("/admin/add-candidat")
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
-        maxFileSize = 1024 * 1024 * 10,       // 10MB
-        maxRequestSize = 1024 * 1024 * 50     // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50
 )
 public class AddCandidatServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "cv"; // Correspond à RegisterCandidatServlet
+    private static final String UPLOAD_DIR = "cv";
     private UtilisateurDAO utilisateurDAO;
     private Gson gson;
 
@@ -49,14 +49,12 @@ public class AddCandidatServlet extends HttpServlet {
         String cvFileName = null;
 
         try {
-            // Récupérer les données du formulaire
             String nom = request.getParameter("nom");
             String prenom = request.getParameter("prenom");
             String email = request.getParameter("email");
             String motDePasse = request.getParameter("motDePasse");
             String domaineProfessionnel = request.getParameter("domaineProfessionnel");
 
-            // Validation des champs obligatoires
             if (nom == null || nom.trim().isEmpty() ||
                     prenom == null || prenom.trim().isEmpty() ||
                     email == null || email.trim().isEmpty() ||
@@ -68,7 +66,6 @@ public class AddCandidatServlet extends HttpServlet {
                 return;
             }
 
-            // Vérifier si l'email existe déjà
             if (utilisateurDAO.emailExists(email)) {
                 result.put("success", false);
                 result.put("message", "Cet email est déjà utilisé");
@@ -76,7 +73,6 @@ public class AddCandidatServlet extends HttpServlet {
                 return;
             }
 
-            // Valider le domaine professionnel (si fourni)
             if (domaineProfessionnel != null && !domaineProfessionnel.trim().isEmpty()) {
                 try {
                     Candidat.DomaineProfessionnel.valueOf(domaineProfessionnel.trim());
@@ -88,12 +84,10 @@ public class AddCandidatServlet extends HttpServlet {
                 }
             }
 
-            // Gérer l'upload du CV
             Part cvPart = request.getPart("cv");
             if (cvPart != null && cvPart.getSize() > 0) {
                 String fileName = extractFileName(cvPart);
 
-                // Vérifier l'extension
                 if (fileName == null || !fileName.toLowerCase().endsWith(".pdf")) {
                     result.put("success", false);
                     result.put("message", "Seuls les fichiers PDF sont acceptés pour le CV");
@@ -101,25 +95,21 @@ public class AddCandidatServlet extends HttpServlet {
                     return;
                 }
 
-                // Créer le répertoire s'il n'existe pas
                 String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) {
                     uploadDir.mkdir();
                 }
 
-                // Générer un nom unique pour le fichier
                 String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
                 String filePath = uploadPath + File.separator + uniqueFileName;
 
-                // Sauvegarder le fichier
                 try (InputStream inputStream = cvPart.getInputStream()) {
                     Files.copy(inputStream, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
                     cvFileName = uniqueFileName;
                 }
             }
 
-            // Créer le candidat
             Candidat candidat = new Candidat();
             candidat.setNom(nom.trim());
             candidat.setPrenom(prenom.trim());
@@ -127,16 +117,14 @@ public class AddCandidatServlet extends HttpServlet {
             candidat.setMotDePasse(motDePasse);
             candidat.setRole(Utilisateur.Role.CANDIDAT);
 
-            // Définir le domaine professionnel (utilise l'enum)
             if (domaineProfessionnel != null && !domaineProfessionnel.trim().isEmpty()) {
                 candidat.setDomaineProfessionnel(domaineProfessionnel.trim());
             }
 
             candidat.setCv(cvFileName);
-            candidat.setStatut(true); // Actif par défaut
-            candidat.setEstVerifie(false); // Non vérifié par défaut
+            candidat.setStatut(true);
+            candidat.setEstVerifie(false);
 
-            // Enregistrer dans la base de données
             boolean created = utilisateurDAO.createCandidat(candidat);
 
             if (created) {
@@ -146,20 +134,17 @@ public class AddCandidatServlet extends HttpServlet {
                 result.put("success", false);
                 result.put("message", "Erreur lors de la création du candidat");
 
-                // Supprimer le fichier uploadé en cas d'erreur
                 deleteUploadedFile(cvFileName);
             }
 
             response.getWriter().write(gson.toJson(result));
 
         } catch (IllegalArgumentException e) {
-            // Erreur de validation du domaine professionnel
             result.put("success", false);
             result.put("message", "Domaine professionnel invalide: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(gson.toJson(result));
 
-            // Supprimer le fichier uploadé
             deleteUploadedFile(cvFileName);
 
         } catch (Exception e) {
@@ -169,14 +154,11 @@ public class AddCandidatServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write(gson.toJson(result));
 
-            // Supprimer le fichier uploadé en cas d'erreur
             deleteUploadedFile(cvFileName);
         }
     }
 
-    /**
-     * Extrait le nom du fichier depuis la partie multipart
-     */
+
     private String extractFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] items = contentDisp.split(";");
@@ -188,9 +170,7 @@ public class AddCandidatServlet extends HttpServlet {
         return null;
     }
 
-    /**
-     * Supprime un fichier uploadé
-     */
+
     private void deleteUploadedFile(String fileName) {
         if (fileName != null) {
             try {

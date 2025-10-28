@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 @WebServlet("/admin/candidat-details")
 public class CandidatDetailsServlet extends HttpServlet {
 
-    private static final String CV_DIR = "cv"; // Correspond à RegisterCandidatServlet
+    private static final String CV_DIR = "cv";
     private CandidatDAO candidatDAO;
     private Gson gson;
 
@@ -35,19 +35,15 @@ public class CandidatDetailsServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-        // Si l'action est "downloadCV", télécharger/afficher le CV
         if ("downloadCV".equals(action)) {
             downloadCV(request, response);
             return;
         }
 
-        // Sinon, retourner les détails du candidat en JSON
         getCandidatDetails(request, response);
     }
 
-    /**
-     * Récupère les détails d'un candidat en JSON
-     */
+
     private void getCandidatDetails(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
@@ -74,9 +70,7 @@ public class CandidatDetailsServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Télécharge ou affiche le CV d'un candidat
-     */
+
     private void downloadCV(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -97,33 +91,26 @@ public class CandidatDetailsServlet extends HttpServlet {
                 return;
             }
 
-            // Construire le chemin du fichier CV
             String uploadPath = getServletContext().getRealPath("") + File.separator + CV_DIR;
             Path cvPath = Paths.get(uploadPath, cvFileName);
 
-            // Vérifier si le fichier existe
             if (!Files.exists(cvPath)) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("Fichier CV introuvable sur le serveur");
                 return;
             }
 
-            // Déterminer si on veut visualiser ou télécharger
             String viewMode = request.getParameter("view");
 
-            // Configuration de la réponse
             response.setContentType("application/pdf");
             response.setContentLengthLong(Files.size(cvPath));
 
             if ("inline".equals(viewMode)) {
-                // Afficher le PDF dans le navigateur
                 response.setHeader("Content-Disposition", "inline; filename=\"" + candidat.getCvFileName() + "\"");
             } else {
-                // Télécharger le PDF
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + candidat.getCvFileName() + "\"");
             }
 
-            // Envoyer le fichier
             Files.copy(cvPath, response.getOutputStream());
             response.getOutputStream().flush();
 
@@ -137,20 +124,17 @@ public class CandidatDetailsServlet extends HttpServlet {
         }
     }
 
-    /**
-     * DTO pour les détails d'un candidat
-     * Sérialise les informations du candidat en JSON
-     */
+
     public static class CandidatDetailsDTO {
         private long id;
         private String nom;
         private String prenom;
         private String email;
-        private String domaineProfessionnel;        // Nom d'affichage (ex: "Intelligence Artificielle")
-        private String domaineProfessionnelEnum;    // Nom de l'enum (ex: "INTELLIGENCE_ARTIFICIELLE")
+        private String domaineProfessionnel;
+        private String domaineProfessionnelEnum;
         private String cvFileName;
-        private String cvDownloadUrl;               // URL pour télécharger le CV
-        private String cvViewUrl;                   // URL pour visualiser le CV
+        private String cvDownloadUrl;
+        private String cvViewUrl;
         private boolean hasCv;
         private boolean statut;
         private boolean estVerifie;
@@ -161,10 +145,8 @@ public class CandidatDetailsServlet extends HttpServlet {
             this.prenom = candidat.getPrenom();
             this.email = candidat.getEmail();
 
-            // Récupération du nom d'affichage du domaine professionnel
             this.domaineProfessionnel = candidat.getDomaineProfessionnelDisplayName();
 
-            // Récupération du nom de l'enum (utile pour les formulaires)
             this.domaineProfessionnelEnum = candidat.getDomaineProfessionnelEnumName();
 
             this.cvFileName = candidat.getCvFileName();
@@ -172,14 +154,12 @@ public class CandidatDetailsServlet extends HttpServlet {
             this.statut = candidat.getStatut();
             this.estVerifie = candidat.isEstVerifie();
 
-            // Construction des URLs pour le CV
             if (this.hasCv) {
                 this.cvDownloadUrl = contextPath + "/admin/candidat-details?action=downloadCV&id=" + candidat.getId();
                 this.cvViewUrl = contextPath + "/admin/candidat-details?action=downloadCV&id=" + candidat.getId() + "&view=inline";
             }
         }
 
-        // Getters
         public long getId() { return id; }
         public String getNom() { return nom; }
         public String getPrenom() { return prenom; }
